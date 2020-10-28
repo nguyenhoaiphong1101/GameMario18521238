@@ -1,4 +1,4 @@
-#pragma once
+	#pragma once
 #include "GameObject.h"
 
 #define MARIO_WALKING_SPEED		0.15f 
