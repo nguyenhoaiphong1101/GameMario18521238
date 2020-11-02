@@ -7,6 +7,9 @@
 #include "Sprites.h"
 #include "Portal.h"
 #include "NoCollision.h"
+#include "Box.h"
+#include "Drain.h"
+
 
 using namespace std;
 
@@ -33,6 +36,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_GOOMBA	2
 #define OBJECT_TYPE_KOOPAS	3
 #define OBJECT_TYPE_NOCOLLISION	4
+#define OBJECT_TYPE_BOX	5
+#define OBJECT_TYPE_DRAIN	6
 
 #define OBJECT_TYPE_PORTAL	50
 
@@ -159,6 +164,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
 	case OBJECT_TYPE_NOCOLLISION: obj = new CNoCollision() ; break;
+	case OBJECT_TYPE_BOX: obj = new CBox() ; break;
+	case OBJECT_TYPE_DRAIN: obj = new CDrain() ; break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());
@@ -261,7 +268,7 @@ void CPlayScene::Update(DWORD dt)
 	if (player->x <= (game->GetScreenWidth() / 2)) cx = 0;
 	if (player->y > (game->GetScreenHeight() / 2)) cy = 0;//Lúc đầu nó cam k di chuyển đến khi mario qa nửa màn hình
 
-	CGame::GetInstance()->SetCamPos(cx, cy);
+	CGame::GetInstance()->SetCamPos(cx, -30);
 }
 
 void CPlayScene::Render()
@@ -292,6 +299,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	switch (KeyCode)
 	{
 	case DIK_SPACE:
+		if(mario->checkjumping == 0)
 		mario->SetState(MARIO_STATE_JUMP);
 		break;
 	case DIK_A: 

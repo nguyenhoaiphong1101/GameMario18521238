@@ -45,12 +45,15 @@ class CMario : public CGameObject
 	DWORD untouchable_start;
 
 	float start_x;			// initial position of Mario at scene
-	float start_y; 
+	float start_y;
+public: int checkjumping = 0;
+	
 public: 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
 	virtual void Render();
 
+	int GetCheckJumping() { return checkjumping; };
 	void SetState(int state);
 	void SetLevel(int l) { level = l; }
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }

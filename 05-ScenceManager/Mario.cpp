@@ -6,6 +6,7 @@
 #include "Game.h"
 
 #include "Goomba.h"
+#include "Box.h"
 #include "Portal.h"
 
 CMario::CMario(float x, float y) : CGameObject()
@@ -19,6 +20,20 @@ CMario::CMario(float x, float y) : CGameObject()
 	this->x = x; 
 	this->y = y; 
 }
+
+//UINT checkCollBox(vector<LPCOLLISIONEVENT> a)
+//{
+//	for (UINT i = 0; i < a.size(); i++)
+//	{
+//		LPCOLLISIONEVENT e = a[i];
+//		if (dynamic_cast<CBox*>(e->obj))
+//		{
+//			return i;
+//		}
+//	}
+//	return -1;
+//}
+
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 {
@@ -47,11 +62,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// No collision occured, proceed normally
 	if (coEvents.size()==0)
 	{
-		x += dx; 
+		x += dx;
 		y += dy;
 	}
 	else
 	{
+		
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0; 
 		float rdy = 0;
@@ -62,6 +78,32 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
+		/*if (checkCollBox(coEventsResult) != -1)
+		{
+			LPCOLLISIONEVENT e = coEventsResult[checkCollBox(coEventsResult)];
+			if (e->nx != 0 || e->ny >= 0)
+			{
+				x += dx;
+				y += dy;
+			}
+			else {
+				x += min_tx * dx + nx * 0.4f;
+				y += min_ty * dy + ny * 0.4f;
+
+				if (nx != 0) vx = 0;
+				if (ny != 0) vy = 0;
+			}
+			
+		}
+		else
+		{
+			x += min_tx * dx + nx * 0.4f;
+			y += min_ty * dy + ny * 0.4f;
+
+			if (nx != 0) vx = 0;
+			if (ny != 0) vy = 0;
+		}*/
+		
 		
 		// block every object first!
 		x += min_tx*dx + nx*0.4f;
@@ -70,6 +112,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		if (nx!=0) vx = 0;
 		if (ny!=0) vy = 0;
 
+		
+
 
 		//
 		// Collision logic with other objects
@@ -77,6 +121,19 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
+
+			if (e->ny < 0)
+			{
+				checkjumping = 0;
+			}
+
+			if (dynamic_cast<CBox*>(e->obj))
+			{
+				if (e->ny>=0||e->nx!=0)
+				{
+
+				}
+			}
 
 			if (dynamic_cast<CGoomba *>(e->obj)) // if e->obj is Goomba 
 			{
@@ -173,6 +230,7 @@ void CMario::SetState(int state)
 		break;
 	case MARIO_STATE_JUMP:
 		// TODO: need to check if Mario is *current* on a platform before allowing to jump again
+		checkjumping = 1;
 		vy = -MARIO_JUMP_SPEED_Y;
 		break; 
 	case MARIO_STATE_IDLE: 
@@ -211,5 +269,6 @@ void CMario::Reset()
 	SetPosition(start_x, start_y);
 	SetSpeed(0, 0);
 }
+
 
 

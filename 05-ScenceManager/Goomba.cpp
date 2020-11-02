@@ -24,24 +24,32 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	// 
 
-	x += dx;
-	y += dy;
-
-	if (vx < 0 && x < 0) {
-		x = 0; vx = -vx;
-	}
-
-	if (vx > 0 && x > 290) {
-		x = 290; vx = -vx;
-	}
+	
 
 	if (state == GOOMBA_STATE_DIE)
 	{
+		x = -100;
 	}
+	else
+	{
+		x += dx;
+		y += dy;
+
+		if (vx < 0 && x < 0) {
+			x = 0; vx = -vx;
+		}
+
+		if (vx > 0 && x > 290) {
+			x = 290; vx = -vx;
+		}
+	}
+
+	
 }
 
 void CGoomba::Render()
 {
+	
 	int ani = GOOMBA_ANI_WALKING;
 	if (state == GOOMBA_STATE_DIE) {
 		ani = GOOMBA_ANI_DIE;
