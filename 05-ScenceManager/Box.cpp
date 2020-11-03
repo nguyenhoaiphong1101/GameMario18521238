@@ -13,3 +13,4 @@ void CBox::GetBoundingBox(float& l, float& t, float& r, float& b)
 	r = x+BOX_BBOX_HEIGHT;
 	b = y+BOX_BBOX_WIDTH;
 }
+

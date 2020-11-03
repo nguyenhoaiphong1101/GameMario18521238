@@ -45,6 +45,7 @@ class CGameObject
 {
 public:
 
+	int typeObj;
 	float x; 
 	float y;
 

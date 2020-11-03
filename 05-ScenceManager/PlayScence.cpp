@@ -9,6 +9,8 @@
 #include "NoCollision.h"
 #include "Box.h"
 #include "Drain.h"
+#include "Fire.h"
+
 
 
 using namespace std;
@@ -38,6 +40,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_NOCOLLISION	4
 #define OBJECT_TYPE_BOX	5
 #define OBJECT_TYPE_DRAIN	6
+
+#define OBJECT_ANI_SET_FIRE	9
 
 #define OBJECT_TYPE_PORTAL	50
 
@@ -147,6 +151,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	CGameObject *obj = NULL;
 
+	CGameObject *objW = NULL;
+
 	switch (object_type)
 	{
 	case OBJECT_TYPE_MARIO:
@@ -185,6 +191,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 
 	obj->SetAnimationSet(ani_set);
+	
 	objects.push_back(obj);
 }
 
@@ -239,7 +246,33 @@ void CPlayScene::Load()
 void CPlayScene::Update(DWORD dt)
 {
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
-	// TO-DO: This is a "dirty" way, need a more organized way 
+	// TO-DO: This is a "dirty" way, need a more organized way
+	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+
+	if (player->GetState() == MARIO_STATE_SHOOT_FIRE)
+	{
+		CGameObject* obj = NULL;
+		obj = new CFire();
+		if (player->nx == 1)
+		{
+			obj->SetPosition(player->x + MARIO_FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
+			obj->vx = 0.15f;
+			obj->nx = 1;
+			
+		}
+		else
+		{
+			obj->SetPosition(player->x - FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
+			obj->vx = -0.15f;
+			obj->nx = -1;
+			
+		}
+
+		LPANIMATION_SET ani_set = animation_sets->Get(OBJECT_ANI_SET_FIRE);
+		obj->SetAnimationSet(ani_set);
+		objects.push_back(obj);
+	}
+	
 
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
@@ -294,16 +327,53 @@ void CPlayScene::Unload()
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
+	CGame* game = CGame::GetInstance();
+
 
 	CMario *mario = ((CPlayScene*)scence)->GetPlayer();
 	switch (KeyCode)
 	{
 	case DIK_SPACE:
-		if(mario->checkjumping == 0)
-		mario->SetState(MARIO_STATE_JUMP);
+		if (mario->checkjumping == 0)
+		{
+			if (game->IsKeyDown(DIK_LSHIFT))
+			{
+				mario->SetState(MARIO_STATE_JUMP_HIGH);
+			}else
+			mario->SetState(MARIO_STATE_JUMP);
+		}
 		break;
 	case DIK_A: 
 		mario->Reset();
+		break;
+	case DIK_I:
+		mario->SetLevel(MARIO_LEVEL_FIRE);
+		break;
+	case DIK_L:
+		if (mario->GetLevel() == MARIO_LEVEL_FIRE)
+		{
+			mario->SetState(MARIO_STATE_SHOOT_FIRE);
+			/*CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+			CGameObject* obj = NULL;
+			obj = new CFire();
+			if (mario->nx = 1)
+			{
+				obj->SetPosition(mario->x + MARIO_FIRE_BBOX_WIDTH, mario->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
+				obj->vx = 0.15f;
+				obj->nx = 1;
+				LPANIMATION_SET ani_set = animation_sets->Get(FIRE_ANI_RIGHT);
+				obj->SetAnimationSet(ani_set);
+			}
+			else
+			{
+				obj->SetPosition(mario->x - FIRE_BBOX_WIDTH, mario->y + (MARIO_FIRE_BBOX_HEIGHT  - FIRE_BBOX_WIDTH)/2);
+				obj->vx = -0.15f;
+				obj->nx = -1;
+				LPANIMATION_SET ani_set = animation_sets->Get(FIRE_ANI_LEFT);
+				obj->SetAnimationSet(ani_set);
+			}*/
+			
+		}
 		break;
 	}
 }
@@ -315,10 +385,30 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
+	/*
+	if (game->IsKeyDown(DIK_LSHIFT))
+	{
+		if (game->IsKeyDown(DIK_SPACE))
+	}*/
+
 	if (game->IsKeyDown(DIK_RIGHT))
+	{
+		if (game->IsKeyDown(DIK_LSHIFT))
+		{
+			mario->SetState(MARIO_STATE_WALKING_RIGHT_FAST);
+		}else
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
+
+	}
 	else if (game->IsKeyDown(DIK_LEFT))
-		mario->SetState(MARIO_STATE_WALKING_LEFT);
+	{
+		if (game->IsKeyDown(DIK_LSHIFT))
+		{
+			mario->SetState(MARIO_STATE_WALKING_LEFT_FAST);
+		}
+		else
+			mario->SetState(MARIO_STATE_WALKING_LEFT);
+	}
 	else
 		mario->SetState(MARIO_STATE_IDLE);
 }

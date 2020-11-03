@@ -8,6 +8,7 @@
 #include "Goomba.h"
 #include "Box.h"
 #include "Portal.h"
+#include "Fire.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -21,18 +22,18 @@ CMario::CMario(float x, float y) : CGameObject()
 	this->y = y; 
 }
 
-//UINT checkCollBox(vector<LPCOLLISIONEVENT> a)
-//{
-//	for (UINT i = 0; i < a.size(); i++)
-//	{
-//		LPCOLLISIONEVENT e = a[i];
-//		if (dynamic_cast<CBox*>(e->obj))
-//		{
-//			return i;
-//		}
-//	}
-//	return -1;
-//}
+UINT checkCollBox(vector<LPCOLLISIONEVENT> a)
+{
+	for (UINT i = 0; i < a.size(); i++)
+	{
+		LPCOLLISIONEVENT e = a[i];
+		if (dynamic_cast<CBox*>(e->obj))
+		{
+			return i;
+		}
+	}
+	return -1;
+}
 
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
@@ -78,40 +79,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
-		/*if (checkCollBox(coEventsResult) != -1)
-		{
-			LPCOLLISIONEVENT e = coEventsResult[checkCollBox(coEventsResult)];
-			if (e->nx != 0 || e->ny >= 0)
-			{
-				x += dx;
-				y += dy;
-			}
-			else {
-				x += min_tx * dx + nx * 0.4f;
-				y += min_ty * dy + ny * 0.4f;
 
-				if (nx != 0) vx = 0;
-				if (ny != 0) vy = 0;
-			}
-			
-		}
-		else
-		{
-			x += min_tx * dx + nx * 0.4f;
-			y += min_ty * dy + ny * 0.4f;
-
-			if (nx != 0) vx = 0;
-			if (ny != 0) vy = 0;
-		}*/
 		
 		
-		// block every object first!
-		x += min_tx*dx + nx*0.4f;
-		y += min_ty*dy + ny*0.4f;
+		//// block every object first!
+		x += min_tx * dx + nx * 0.4f;
+		y += min_ty * dy + ny * 0.4f;
 
-		if (nx!=0) vx = 0;
-		if (ny!=0) vy = 0;
-
+		if (nx != 0) vx = 0;
+		if (ny != 0) vy = 0;
 		
 
 
@@ -127,13 +103,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				checkjumping = 0;
 			}
 
-			if (dynamic_cast<CBox*>(e->obj))
+			/*if (dynamic_cast<CBox*>(e->obj))
 			{
 				if (e->ny>=0||e->nx!=0)
 				{
-
+					e->obj->GetBoundingBox()
 				}
-			}
+			}*/
 
 			if (dynamic_cast<CGoomba *>(e->obj)) // if e->obj is Goomba 
 			{
@@ -183,6 +159,33 @@ void CMario::Render()
 	if (state == MARIO_STATE_DIE)
 		ani = MARIO_ANI_DIE;
 	else
+	/*{
+		switch (level)
+		{
+		case MARIO_LEVEL_BIG:
+			if (vx == 0)
+			{
+				if (nx > 0) ani = MARIO_ANI_BIG_IDLE_RIGHT;
+				else ani = MARIO_ANI_BIG_IDLE_LEFT;
+			}
+			else if (vx > 0)
+				ani = MARIO_ANI_BIG_WALKING_RIGHT;
+			else ani = MARIO_ANI_BIG_WALKING_LEFT;
+			break;
+		case MARIO_LEVEL_SMALL:
+			if (vx == 0)
+			{
+				if (nx > 0) ani = MARIO_ANI_SMALL_IDLE_RIGHT;
+				else ani = MARIO_ANI_SMALL_IDLE_LEFT;
+			}
+			else if (vx > 0)
+				ani = MARIO_ANI_SMALL_WALKING_RIGHT;
+			else ani = MARIO_ANI_SMALL_WALKING_LEFT;
+			break;
+		default:
+			break;
+		}
+	}*/
 	if (level == MARIO_LEVEL_BIG)
 	{
 		if (vx == 0)
@@ -204,6 +207,28 @@ void CMario::Render()
 		else if (vx > 0)
 			ani = MARIO_ANI_SMALL_WALKING_RIGHT;
 		else ani = MARIO_ANI_SMALL_WALKING_LEFT;
+	} 
+	else if(level == MARIO_LEVEL_FIRE)
+	{
+		if (state == MARIO_STATE_SHOOT_FIRE)
+		{
+			if (nx == 1)
+			{
+				ani = MARIO_ANI_SHOOT_RIGHT;
+			}
+			else
+			{
+				ani = MARIO_ANI_SHOOT_LEFT;
+			}
+		}
+		if (vx == 0)
+		{
+			if (nx > 0) ani = MARIO_ANI_FIRE_IDLE_RIGHT;
+			else ani = MARIO_ANI_FIRE_IDLE_LEFT;
+		}
+		else if (vx > 0)
+			ani = MARIO_ANI_FIRE_WALKING_RIGHT;
+		else ani = MARIO_ANI_FIRE_WALKING_LEFT;
 	}
 
 	int alpha = 255;
@@ -239,6 +264,34 @@ void CMario::SetState(int state)
 	case MARIO_STATE_DIE:
 		vy = -MARIO_DIE_DEFLECT_SPEED;
 		break;
+	case MARIO_STATE_WALKING_RIGHT_FAST:
+		vx = MARIO_WALKING_SPEED * 1.5;
+		nx = 1;
+			break;
+	case MARIO_STATE_WALKING_LEFT_FAST:
+		vx = -MARIO_WALKING_SPEED * 1.5;
+		nx = -1;
+			break;
+	case MARIO_STATE_JUMP_HIGH:
+		checkjumping = 1;
+		vy = -MARIO_JUMP_SPEED_Y*1.25;
+		break;
+	case MARIO_STATE_SHOOT_FIRE:
+		/*CGameObject* obj = NULL;
+		obj = new CFire();
+		if (nx = 1)
+		{
+			obj->SetPosition(x + MARIO_FIRE_BBOX_WIDTH, y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
+			obj->vx = 0.15f;
+			obj->nx = 1;
+		}
+		else
+		{
+			obj->SetPosition(x - FIRE_BBOX_WIDTH, y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
+			obj->vx = -0.15f;
+			obj->nx = -1;
+		}*/
+		break;
 	}
 }
 
@@ -252,10 +305,15 @@ void CMario::GetBoundingBox(float &left, float &top, float &right, float &bottom
 		right = x + MARIO_BIG_BBOX_WIDTH;
 		bottom = y + MARIO_BIG_BBOX_HEIGHT;
 	}
-	else
+	else if(level == MARIO_LEVEL_SMALL)
 	{
 		right = x + MARIO_SMALL_BBOX_WIDTH;
 		bottom = y + MARIO_SMALL_BBOX_HEIGHT;
+	} 
+	else if (level == MARIO_LEVEL_FIRE)
+	{
+		right = x + MARIO_FIRE_BBOX_WIDTH;
+		bottom = y + MARIO_FIRE_BBOX_HEIGHT;
 	}
 }
 

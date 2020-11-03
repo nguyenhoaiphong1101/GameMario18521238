@@ -15,17 +15,20 @@ protected:
 	CMario *player;					// A play scene has to have player, right? 
 
 	vector<LPGAMEOBJECT> objects;
+	vector<LPGAMEOBJECT> objectsW;
 
 	void _ParseSection_TEXTURES(string line);
 	void _ParseSection_SPRITES(string line);
 	void _ParseSection_ANIMATIONS(string line);
 	void _ParseSection_ANIMATION_SETS(string line);
 	void _ParseSection_OBJECTS(string line);
+	
+
 
 	
 public: 
 	CPlayScene(int id, LPCWSTR filePath);
-
+	void addObject(CGameObject* a) { objects.push_back(a); };
 	virtual void Load();
 	virtual void Update(DWORD dt);
 	virtual void Render();
@@ -36,8 +39,9 @@ public:
 	//friend class CPlayScenceKeyHandler;
 };
 
-class CPlayScenceKeyHandler : public CScenceKeyHandler
+class CPlayScenceKeyHandler : public CScenceKeyHandler 
 {
+	
 public: 
 	virtual void KeyState(BYTE *states);
 	virtual void OnKeyDown(int KeyCode);
