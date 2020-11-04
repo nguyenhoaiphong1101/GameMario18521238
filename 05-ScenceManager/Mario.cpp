@@ -9,6 +9,8 @@
 #include "Box.h"
 #include "Portal.h"
 #include "Fire.h"
+#include "Brick.h"
+#include "Drain.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -79,18 +81,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
-
 		
 		
 		//// block every object first!
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-
-		if (nx != 0) vx = 0;
-		if (ny != 0) vy = 0;
 		
-
-
 		//
 		// Collision logic with other objects
 		//
@@ -141,11 +137,33 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 					}
 				}
 			} // if Goomba
-			else if (dynamic_cast<CPortal *>(e->obj))
+			if (dynamic_cast<CBox*>(e->obj))
+			{
+				if (e->ny > 0)
+				{
+					y += dy;
+				}
+				else if (e->nx!=0)
+				{
+					x += dx;	
+				}
+				else
+				{
+					if (nx != 0) vx = 0;
+					if (ny != 0) vy = 0;
+				}
+			}
+			else
+			{
+				if (nx != 0) vx = 0;
+				if (ny != 0) vy = 0;
+			}
+			if (dynamic_cast<CPortal *>(e->obj))
 			{
 				CPortal *p = dynamic_cast<CPortal *>(e->obj);
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
+			
 		}
 	}
 
@@ -186,6 +204,7 @@ void CMario::Render()
 			break;
 		}
 	}*/
+		
 	if (level == MARIO_LEVEL_BIG)
 	{
 		if (vx == 0)
@@ -197,6 +216,7 @@ void CMario::Render()
 			ani = MARIO_ANI_BIG_WALKING_RIGHT; 
 		else ani = MARIO_ANI_BIG_WALKING_LEFT;
 	}
+	
 	else if (level == MARIO_LEVEL_SMALL)
 	{
 		if (vx == 0)
@@ -210,17 +230,7 @@ void CMario::Render()
 	} 
 	else if(level == MARIO_LEVEL_FIRE)
 	{
-		if (state == MARIO_STATE_SHOOT_FIRE)
-		{
-			if (nx == 1)
-			{
-				ani = MARIO_ANI_SHOOT_RIGHT;
-			}
-			else
-			{
-				ani = MARIO_ANI_SHOOT_LEFT;
-			}
-		}
+		
 		if (vx == 0)
 		{
 			if (nx > 0) ani = MARIO_ANI_FIRE_IDLE_RIGHT;
@@ -230,6 +240,18 @@ void CMario::Render()
 			ani = MARIO_ANI_FIRE_WALKING_RIGHT;
 		else ani = MARIO_ANI_FIRE_WALKING_LEFT;
 	}
+
+	/*if (state == MARIO_STATE_SHOOT_FIRE)
+	{
+		if (nx == 1)
+		{
+			ani = MARIO_ANI_SHOOT_RIGHT;
+		}
+		else
+		{
+			ani = MARIO_ANI_SHOOT_LEFT;
+		}
+	}*/
 
 	int alpha = 255;
 	if (untouchable) alpha = 128;

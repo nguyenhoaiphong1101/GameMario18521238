@@ -255,14 +255,14 @@ void CPlayScene::Update(DWORD dt)
 		obj = new CFire();
 		if (player->nx == 1)
 		{
-			obj->SetPosition(player->x + MARIO_FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
+			obj->SetPosition(player->x + MARIO_FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
 			obj->vx = 0.15f;
 			obj->nx = 1;
 			
 		}
 		else
 		{
-			obj->SetPosition(player->x - FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
+			obj->SetPosition(player->x - FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
 			obj->vx = -0.15f;
 			obj->nx = -1;
 			
@@ -273,6 +273,8 @@ void CPlayScene::Update(DWORD dt)
 		objects.push_back(obj);
 	}
 	
+	
+
 
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 1; i < objects.size(); i++)
@@ -307,7 +309,10 @@ void CPlayScene::Update(DWORD dt)
 void CPlayScene::Render()
 {
 	for (int i = 0; i < objects.size(); i++)
-		objects[i]->Render();
+	{
+			objects[i]->Render();
+	}
+		
 }
 
 /*

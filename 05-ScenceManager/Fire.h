@@ -7,6 +7,8 @@
 #define FIRE_ANI_RIGHT  0
 #define FIRE_ANI_LEFT  1
 
+#define FIRE_GRAVITY 0.002f
+
 class CFire: public CGameObject
 {
 public:

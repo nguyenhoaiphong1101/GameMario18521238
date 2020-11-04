@@ -57,6 +57,7 @@ public:
 
 	int nx;	 
 
+	int show = 1;
 	int state;
 
 	DWORD dt; 
