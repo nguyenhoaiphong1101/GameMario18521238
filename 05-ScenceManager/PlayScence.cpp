@@ -398,16 +398,17 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	if (game->IsKeyDown(DIK_RIGHT))
 	{
-		if (game->IsKeyDown(DIK_LSHIFT))
+		if (game->IsKeyDown(DIK_Z))
 		{
 			mario->SetState(MARIO_STATE_WALKING_RIGHT_FAST);
-		}else
+		}
+		else
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
 
 	}
 	else if (game->IsKeyDown(DIK_LEFT))
 	{
-		if (game->IsKeyDown(DIK_LSHIFT))
+		if (game->IsKeyDown(DIK_Z))
 		{
 			mario->SetState(MARIO_STATE_WALKING_LEFT_FAST);
 		}

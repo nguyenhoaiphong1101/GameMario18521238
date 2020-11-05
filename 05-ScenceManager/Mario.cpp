@@ -86,7 +86,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 		//// block every object first!
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-		
+		/*if (ny != 0) vy = 0;*/
 		//
 		// Collision logic with other objects
 		//
@@ -149,13 +149,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 				}
 				else
 				{
-					if (nx != 0) vx = 0;
+					//if (nx != 0) vx = 0;
 					if (ny != 0) vy = 0;
 				}
 			}
 			else
 			{
-				if (nx != 0) vx = 0;
 				if (ny != 0) vy = 0;
 			}
 			if (dynamic_cast<CPortal *>(e->obj))
@@ -207,14 +206,34 @@ void CMario::Render()
 		
 	if (level == MARIO_LEVEL_BIG)
 	{
+		
 		if (vx == 0)
 		{
 			if (nx>0) ani = MARIO_ANI_BIG_IDLE_RIGHT;
 			else ani = MARIO_ANI_BIG_IDLE_LEFT;
 		}
-		else if (vx > 0) 
-			ani = MARIO_ANI_BIG_WALKING_RIGHT; 
-		else ani = MARIO_ANI_BIG_WALKING_LEFT;
+		else if (vx > 0)
+		{
+			if (state == MARIO_STATE_WALKING_RIGHT_FAST)
+				ani = MARIO_ANI_RUN_RIGHT;
+			else 
+				ani = MARIO_ANI_BIG_WALKING_RIGHT;
+
+		}
+		else
+		{
+			if (state == MARIO_STATE_WALKING_LEFT_FAST)
+				ani = MARIO_ANI_RUN_LEFT;
+			else
+			ani = MARIO_ANI_BIG_WALKING_LEFT;
+		}
+
+		if(checkjumping==1)
+		{
+			if (nx < 0)
+				ani = MARIO_ANI_FLY_RIGHT;
+			else ani = MARIO_ANI_FLY_LEFT;
+		}
 	}
 	
 	else if (level == MARIO_LEVEL_SMALL)
@@ -287,32 +306,27 @@ void CMario::SetState(int state)
 		vy = -MARIO_DIE_DEFLECT_SPEED;
 		break;
 	case MARIO_STATE_WALKING_RIGHT_FAST:
-		vx = MARIO_WALKING_SPEED * 1.5;
-		nx = 1;
+		if (vx < 0.3f)
+		{
+			vx += MARIO_WALKING_SPEED_PLUS;
+			nx = 1;
+		}
+		
 			break;
 	case MARIO_STATE_WALKING_LEFT_FAST:
-		vx = -MARIO_WALKING_SPEED * 1.5;
-		nx = -1;
+		if (vx > -0.3f)
+		{
+			vx -= MARIO_WALKING_SPEED_PLUS;
+			nx = -1;
+		}
+		
 			break;
 	case MARIO_STATE_JUMP_HIGH:
 		checkjumping = 1;
 		vy = -MARIO_JUMP_SPEED_Y*1.25;
 		break;
 	case MARIO_STATE_SHOOT_FIRE:
-		/*CGameObject* obj = NULL;
-		obj = new CFire();
-		if (nx = 1)
-		{
-			obj->SetPosition(x + MARIO_FIRE_BBOX_WIDTH, y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
-			obj->vx = 0.15f;
-			obj->nx = 1;
-		}
-		else
-		{
-			obj->SetPosition(x - FIRE_BBOX_WIDTH, y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
-			obj->vx = -0.15f;
-			obj->nx = -1;
-		}*/
+		
 		break;
 	}
 }
