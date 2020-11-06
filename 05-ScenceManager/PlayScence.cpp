@@ -303,7 +303,7 @@ void CPlayScene::Update(DWORD dt)
 	if (player->x <= (game->GetScreenWidth() / 2)) cx = 0;
 	if (player->y > (game->GetScreenHeight() / 2)) cy = 0;//Lúc đầu nó cam k di chuyển đến khi mario qa nửa màn hình
 
-	CGame::GetInstance()->SetCamPos(cx, -30);
+	CGame::GetInstance()->SetCamPos(cx, -46);
 }
 
 void CPlayScene::Render()
@@ -351,34 +351,50 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_A: 
 		mario->Reset();
 		break;
+	case DIK_R: 
+		mario->attack=true;
+		break;
+	case DIK_S:
+		mario->holdKoopas = true;
+		break;
 	case DIK_I:
 		mario->SetLevel(MARIO_LEVEL_FIRE);
+		break;
+	case DIK_DOWN:
+		mario->sit=true;
+		break;
+	case DIK_O:
+		mario->SetLevel(MARIO_LEVEL_FOX);
 		break;
 	case DIK_L:
 		if (mario->GetLevel() == MARIO_LEVEL_FIRE)
 		{
 			mario->SetState(MARIO_STATE_SHOOT_FIRE);
-			/*CAnimationSets* animation_sets = CAnimationSets::GetInstance();
-			CGameObject* obj = NULL;
-			obj = new CFire();
-			if (mario->nx = 1)
-			{
-				obj->SetPosition(mario->x + MARIO_FIRE_BBOX_WIDTH, mario->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 2);
-				obj->vx = 0.15f;
-				obj->nx = 1;
-				LPANIMATION_SET ani_set = animation_sets->Get(FIRE_ANI_RIGHT);
-				obj->SetAnimationSet(ani_set);
-			}
-			else
-			{
-				obj->SetPosition(mario->x - FIRE_BBOX_WIDTH, mario->y + (MARIO_FIRE_BBOX_HEIGHT  - FIRE_BBOX_WIDTH)/2);
-				obj->vx = -0.15f;
-				obj->nx = -1;
-				LPANIMATION_SET ani_set = animation_sets->Get(FIRE_ANI_LEFT);
-				obj->SetAnimationSet(ani_set);
-			}*/
-			
 		}
+		break;
+	}
+}
+
+void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
+{
+	CGame* game = CGame::GetInstance();
+
+
+	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
+	switch (KeyCode)
+	{
+	case DIK_R:
+		mario->attack = false;
+		break;
+	case DIK_S:
+		mario->holdKoopas = false;
+		break;
+	case DIK_DOWN:
+		mario->sit = false;
+		if(mario->GetLevel()!= MARIO_LEVEL_SMALL)
+		mario->y -= MARIO_SIT_BBOX_HEIGHT;
+		break;
+	default:
 		break;
 	}
 }
@@ -390,11 +406,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
-	/*
-	if (game->IsKeyDown(DIK_LSHIFT))
-	{
-		if (game->IsKeyDown(DIK_SPACE))
-	}*/
+	
 
 	if (game->IsKeyDown(DIK_RIGHT))
 	{
@@ -415,6 +427,11 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 		else
 			mario->SetState(MARIO_STATE_WALKING_LEFT);
 	}
+	/*else if (game->IsKeyDown(DIK_R))
+	{
+		if (mario->GetLevel() == MARIO_LEVEL_FOX)
+			mario->SetState(MARIO_STATE_ATTACK);
+	}*/
 	else
 		mario->SetState(MARIO_STATE_IDLE);
 }
