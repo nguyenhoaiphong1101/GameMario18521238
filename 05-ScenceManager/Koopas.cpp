@@ -18,7 +18,10 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 		bottom = y + KOOPAS_BBOX_HEIGHT;
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT_DIE;
-
+	if (state == KOOPAS_STATE_HIDE)
+	{
+		left = top = right = bottom = 0;
+	}
 	
 
 }
@@ -41,7 +44,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coEvents.clear();
 
 	// turn off collision when die 
-	if (state != KOOPAS_STATE_HOLD)
+	if (state != KOOPAS_STATE_HOLD && state != KOOPAS_STATE_HIDE)
 		CalcPotentialCollisions(coObjects, coEvents);
 
 
@@ -61,7 +64,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
-		if(state != KOOPAS_STATE_DIE && state != KOOPAS_STATE_THROW)
+		if(state != KOOPAS_STATE_DIE && state != KOOPAS_STATE_THROW && state != KOOPAS_STATE_HIDE)
 		{ 
 			x += min_tx * dx + nx * 0.4f;
 			y += min_ty * dy + ny * 0.4f;
@@ -126,7 +129,7 @@ void CKoopas::Render()
 			ani = KOOPAS_ANI_TURN;
 	}
 	else if (vx > 0) ani = KOOPAS_ANI_WALKING_RIGHT;
-	else if (vx <= 0) ani = KOOPAS_ANI_WALKING_LEFT;
+	else if (vx < 0) ani = KOOPAS_ANI_WALKING_LEFT;
 
 	animation_set->at(ani)->Render(x, y);
 
@@ -151,6 +154,9 @@ void CKoopas::SetState(int state)
 	case KOOPAS_STATE_HOLD:
 		vx = 0;
 		vy = 0;
+		break;
+	case KOOPAS_STATE_HIDE:
+		vy = -0.5f;
 		break;
 	case KOOPAS_STATE_THROW:
 		if (mario->nx > 0)

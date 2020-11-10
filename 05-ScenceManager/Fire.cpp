@@ -3,6 +3,7 @@
 #include "Brick.h"
 #include "Box.h"
 #include "Drain.h"
+#include "Koopas.h"
 
 
 void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -37,7 +38,7 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		//if (rdx != 0 && rdx!=dx)
 		//	x += nx*abs(rdx); 
 
-		
+
 
 
 		//// block every object first!
@@ -45,7 +46,7 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		y += min_ty * dy + ny * 0.4f;
 
 
-		
+
 
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
@@ -55,14 +56,27 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
 
-				
-					if (goomba->GetState() != GOOMBA_STATE_DIE)
-					{
-						goomba->SetState(GOOMBA_STATE_DIE);
-						x = -100;
-					}
-				
-			} // if Goomba
+
+				if (goomba->GetState() != GOOMBA_STATE_DIE)
+				{
+					goomba->SetState(GOOMBA_STATE_DIE);
+				}
+				x = -100;
+
+			}
+			if (dynamic_cast<CKoopas*>(e->obj))
+			{
+				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
+
+
+				if (koopas->GetState() != KOOPAS_STATE_HIDE)
+				{
+					koopas->SetState(KOOPAS_STATE_HIDE);
+				}
+				x = -100;
+
+
+			}
 			if (dynamic_cast<CBrick*>(e->obj))
 			{
 				if (e->ny < 0)
@@ -70,16 +84,17 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					vy = -0.25f;
 					y += vy * dt;
 					x += dx;
-				}else if(e->ny>0)
+				}
+				else if (e->ny > 0)
 				{
 					vy = 0.25f;
 					y += vy * dt;
 					x += dx;
 				}
-				else
+				/*else
 				{
 					x = -100;
-				}
+				}*/
 			}
 			if (dynamic_cast<CDrain*>(e->obj))
 			{
@@ -95,7 +110,7 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					x += dx;
 					y += dy;
 				}
-				else if(e->ny <0)
+				else if (e->ny < 0)
 				{
 					vy = -0.25f;
 					y += vy * dt;

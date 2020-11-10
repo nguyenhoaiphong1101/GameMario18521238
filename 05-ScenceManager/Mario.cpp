@@ -44,6 +44,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGameObject::Update(dt);
 
 	// Simple fall down
+	if(flyCan == false)
 	vy += MARIO_GRAVITY * dt;
 
 	vector<LPCOLLISIONEVENT> coEvents;
@@ -111,64 +112,21 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						goomba->SetState(GOOMBA_STATE_DIE_DOWN);
 					}
 				}
-				// jump on top >> kill Goomba and deflect a bit 
-				if (e->ny < 0)
-				{
-					if (goomba->GetState() != GOOMBA_STATE_DIE)
-					{
-						goomba->SetState(GOOMBA_STATE_DIE);
-						vy = -MARIO_JUMP_DEFLECT_SPEED;
-					}
-				}
-				else if (e->nx != 0)
-				{
-					if (untouchable == 0)
+				else
+					// jump on top >> kill Goomba and deflect a bit 
+					if (e->ny < 0)
 					{
 						if (goomba->GetState() != GOOMBA_STATE_DIE)
 						{
-							if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
-							{
-								level = MARIO_LEVEL_BIG;
-								StartUntouchable();
-							}
-							else
-								if (level == MARIO_LEVEL_BIG)
-								{
-									level = MARIO_LEVEL_SMALL;
-									StartUntouchable();
-								}
-								else
-									SetState(MARIO_STATE_DIE);
-						}
-					}
-				}
-			} // if Goomba
-			if (dynamic_cast<CKoopas*>(e->obj))
-			{
-				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
-				if (holdKoopas == true)
-				{
-					koopas->SetState(KOOPAS_STATE_HOLD);
-				}
-				else
-					if (e->ny < 0)
-					{
-						if (koopas->GetState() != KOOPAS_STATE_DIE)
-						{
-							koopas->SetState(KOOPAS_STATE_DIE);
+							goomba->SetState(GOOMBA_STATE_DIE);
 							vy = -MARIO_JUMP_DEFLECT_SPEED;
-						}
-						else
-						{
-							koopas->vx = 0;
 						}
 					}
 					else if (e->nx != 0)
 					{
-
 						if (untouchable == 0)
 						{
-							if (koopas->GetState() != KOOPAS_STATE_DIE)
+							if (goomba->GetState() != GOOMBA_STATE_DIE)
 							{
 								if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
 								{
@@ -184,9 +142,43 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 									else
 										SetState(MARIO_STATE_DIE);
 							}
+						}
+					}
+			} // if Goomba
+			if (dynamic_cast<CKoopas*>(e->obj))
+			{
+				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
+				if (level == MARIO_LEVEL_FOX && attack == true)
+				{
+					if (koopas->GetState() != KOOPAS_STATE_HIDE)
+					{
+						koopas->SetState(KOOPAS_STATE_HIDE);
+					}
+				}
+				else
+					if (holdKoopas == true)
+					{
+						koopas->SetState(KOOPAS_STATE_HOLD);
+					}
+					else
+						if (e->ny < 0)
+						{
+							if (koopas->GetState() != KOOPAS_STATE_DIE)
+							{
+								koopas->SetState(KOOPAS_STATE_DIE);
+								vy = -MARIO_JUMP_DEFLECT_SPEED;
+							}
 							else
 							{
-								if (koopas->vx != 0)
+								koopas->vx = 0;
+							}
+						}
+						else if (e->nx != 0)
+						{
+
+							if (untouchable == 0)
+							{
+								if (koopas->GetState() != KOOPAS_STATE_DIE)
 								{
 									if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
 									{
@@ -194,7 +186,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 										StartUntouchable();
 									}
 									else
-									{
 										if (level == MARIO_LEVEL_BIG)
 										{
 											level = MARIO_LEVEL_SMALL;
@@ -202,25 +193,44 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 										}
 										else
 											SetState(MARIO_STATE_DIE);
-									}
-
 								}
 								else
 								{
-									if (nx > 0)
+									if (koopas->vx != 0)
 									{
-										koopas->vx = -0.3f;
-									}
+										if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
+										{
+											level = MARIO_LEVEL_BIG;
+											StartUntouchable();
+										}
+										else
+										{
+											if (level == MARIO_LEVEL_BIG)
+											{
+												level = MARIO_LEVEL_SMALL;
+												StartUntouchable();
+											}
+											else
+												SetState(MARIO_STATE_DIE);
+										}
 
+									}
 									else
 									{
-										koopas->vx = +0.3f;
-									}
+										if (nx > 0)
+										{
+											koopas->vx = -0.3f;
+										}
 
+										else
+										{
+											koopas->vx = +0.3f;
+										}
+
+									}
 								}
 							}
 						}
-					}
 			}
 			if (dynamic_cast<CBox*>(e->obj))
 			{
@@ -240,7 +250,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			else
 			{
-				if (ny != 0) vy = 0;
+				if (ny != 0 && flyCan!=true) vy = 0;
 			}
 			if (dynamic_cast<CPortal*>(e->obj))
 			{
@@ -250,7 +260,11 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		}
 	}
-
+	if (timeFly != 0 && GetTickCount() - timeFly > 3000)
+	{
+		flyCan = false;
+		timeFly = 0;
+	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 }
@@ -272,13 +286,13 @@ void CMario::Render()
 			{
 				if (nx > 0)
 				{
-					if (vx < 0.051f && checkidle != true)
+					if (vx < MARIO_GEARING_MAX && checkidle != true)
 					{
 						ani = MARIO_ANI_BIG_GEARING_RIGHT;
 					}
 					else
 					{
-						if (vx > 0.051f)
+						if (vx > MARIO_GEARING_MAX)
 							checkidle = false;
 						if (state == MARIO_STATE_WALKING_RIGHT_FAST)
 							ani = MARIO_ANI_BIG_RUN_RIGHT;
@@ -289,7 +303,7 @@ void CMario::Render()
 				}
 				else
 				{
-					if (vx < 0.051f)
+					if (vx < MARIO_GEARING_MAX)
 					{
 						ani = MARIO_ANI_BIG_GEARING_LEFT;
 					}
@@ -304,13 +318,13 @@ void CMario::Render()
 			{
 				if (nx < 0)
 				{
-					if (vx > -0.051f && checkidle != true)
+					if (vx > -MARIO_GEARING_MAX && checkidle != true)
 					{
 						ani = MARIO_ANI_BIG_GEARING_LEFT;
 					}
 					else
 					{
-						if (vx < -0.051f)
+						if (vx < -MARIO_GEARING_MAX)
 							checkidle = false;
 						if (state == MARIO_STATE_WALKING_LEFT_FAST)
 							ani = MARIO_ANI_BIG_RUN_LEFT;
@@ -321,7 +335,7 @@ void CMario::Render()
 				}
 				else
 				{
-					if (vx > -0.051f)
+					if (vx > -MARIO_GEARING_MAX)
 					{
 						ani = MARIO_ANI_BIG_GEARING_RIGHT;
 					}
@@ -366,7 +380,6 @@ void CMario::Render()
 
 			}
 		}
-
 		else if (level == MARIO_LEVEL_SMALL)
 		{
 			if (vx == 0)
@@ -378,13 +391,13 @@ void CMario::Render()
 			{
 				if (nx > 0)
 				{
-					if (vx < 0.051f && checkidle != true)
+					if (vx < MARIO_GEARING_MAX && checkidle != true)
 					{
 						ani = MARIO_ANI_SMALL_GEARING_RIGHT;
 					}
 					else
 					{
-						if (vx > 0.051f)
+						if (vx > MARIO_GEARING_MAX)
 							checkidle = false;
 						if (state == MARIO_STATE_WALKING_RIGHT_FAST)
 							ani = MARIO_ANI_SMALL_RUN_RIGHT;
@@ -395,7 +408,7 @@ void CMario::Render()
 				}
 				else
 				{
-					if (vx < 0.051f)
+					if (vx < MARIO_GEARING_MAX)
 					{
 						ani = MARIO_ANI_SMALL_GEARING_LEFT;
 					}
@@ -410,12 +423,12 @@ void CMario::Render()
 			{
 				if (nx < 0)
 				{
-					if (vx > -0.051f && checkidle != true)
+					if (vx > -MARIO_GEARING_MAX && checkidle != true)
 					{
 						ani = MARIO_ANI_SMALL_GEARING_LEFT;
 					}
 					else {
-						if (vx < -0.051f)
+						if (vx < -MARIO_GEARING_MAX)
 							checkidle = false;
 						if (state == MARIO_STATE_WALKING_LEFT_FAST)
 							ani = MARIO_ANI_SMALL_RUN_LEFT;
@@ -426,7 +439,7 @@ void CMario::Render()
 				}
 				else
 				{
-					if (vx > -0.051f)
+					if (vx > -MARIO_GEARING_MAX)
 					{
 						ani = MARIO_ANI_SMALL_GEARING_RIGHT;
 					}
@@ -457,13 +470,13 @@ void CMario::Render()
 			{
 				if (nx > 0)
 				{
-					if (vx < 0.051f && checkidle != true)
+					if (vx < MARIO_GEARING_MAX && checkidle != true)
 					{
 						ani = MARIO_ANI_FIRE_GEARING_RIGHT;
 					}
 					else
 					{
-						if (vx > 0.051f)
+						if (vx > MARIO_GEARING_MAX)
 							checkidle = false;
 						if (state == MARIO_STATE_WALKING_RIGHT_FAST)
 							ani = MARIO_ANI_FIRE_RUN_RIGHT;
@@ -474,7 +487,7 @@ void CMario::Render()
 				}
 				else
 				{
-					if (vx < 0.051f)
+					if (vx < MARIO_GEARING_MAX)
 					{
 						ani = MARIO_ANI_FIRE_GEARING_LEFT;
 					}
@@ -489,12 +502,12 @@ void CMario::Render()
 			{
 				if (nx < 0)
 				{
-					if (vx > -0.051f && checkidle != true)
+					if (vx > -MARIO_GEARING_MAX && checkidle != true)
 					{
 						ani = MARIO_ANI_FIRE_GEARING_LEFT;
 					}
 					else {
-						if (vx < -0.051f)
+						if (vx < -MARIO_GEARING_MAX)
 							checkidle = false;
 						if (state == MARIO_STATE_WALKING_LEFT_FAST)
 							ani = MARIO_ANI_FIRE_RUN_LEFT;
@@ -505,7 +518,7 @@ void CMario::Render()
 				}
 				else
 				{
-					if (vx > -0.051f)
+					if (vx > -MARIO_GEARING_MAX)
 					{
 						ani = MARIO_ANI_FIRE_GEARING_RIGHT;
 					}
@@ -542,13 +555,13 @@ void CMario::Render()
 			{
 				if (nx > 0)
 				{
-					if (vx < 0.051f && checkidle != true)
+					if (vx < MARIO_GEARING_MAX && checkidle != true)
 					{
 						ani = MARIO_ANI_FOX_GEARING_RIGHT;
 					}
 					else
 					{
-						if (vx > 0.051f)
+						if (vx > MARIO_GEARING_MAX)
 							checkidle = false;
 						if (state == MARIO_STATE_WALKING_RIGHT_FAST)
 							ani = MARIO_ANI_FOX_RUN_RIGHT;
@@ -558,7 +571,7 @@ void CMario::Render()
 				}
 				else
 				{
-					if (vx < 0.051f)
+					if (vx < MARIO_GEARING_MAX)
 					{
 						ani = MARIO_ANI_FOX_GEARING_LEFT;
 					}
@@ -605,13 +618,21 @@ void CMario::Render()
 			if (checkjumping == 1)
 			{
 				if (nx < 0)
-					ani = MARIO_ANI_FOX_FLY_LEFT;
-				else ani = MARIO_ANI_FOX_FLY_RIGHT;
+					ani = MARIO_ANI_FOX_JUMP_LEFT;
+				else ani = MARIO_ANI_FOX_JUMP_RIGHT;
 			}
 			if (attack == true)
 			{
 				ani = MARIO_ANI_FOX_ATTACK;
 			}
+			
+			if (flyCan == true)
+			{
+				if (nx > 0)
+					ani = MARIO_ANI_FOX_FLY_RIGHT;
+				else
+					ani = MARIO_ANI_FOX_FLY_LEFT;
+			} else
 			if (sit == true)
 			{
 				if (nx > 0)
@@ -666,18 +687,19 @@ void CMario::SetState(int state)
 		checkidle = true;
 		vx = 0;
 		break;
-		/*case MARIO_STATE_ATTACK:
-			vx = 0;
-			break;*/
+	case MARIO_STATE_FLY:
+		vy -= MARIO_WALKING_FLY;
+		checkjumping = 1;
+		break;
 
 
 	case MARIO_STATE_DIE:
 		vy = -MARIO_DIE_DEFLECT_SPEED;
 		break;
 	case MARIO_STATE_WALKING_RIGHT_FAST:
-		if (vx < 0.3f)
+		if (vx < MARIO_WALKING_RUN_MAX)
 		{
-			if (vx < -0.05)
+			if (vx < -0.05)//giới hạn tốc độ để mario lấy đà mượt hơn
 				vx = -0.04;
 			else
 			{
@@ -687,7 +709,7 @@ void CMario::SetState(int state)
 		nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT_FAST:
-		if (vx > -0.3f)
+		if (vx > -MARIO_WALKING_RUN_MAX)
 		{
 			if (vx > 0.05)
 				vx = 0.04;
@@ -700,7 +722,7 @@ void CMario::SetState(int state)
 		break;
 	case MARIO_STATE_JUMP_HIGH:
 		checkjumping = 1;
-		vy = -MARIO_JUMP_SPEED_Y * 1.25;
+		vy = -MARIO_JUMP_SPEED_Y_HIGH;
 		break;
 
 	}
@@ -728,8 +750,8 @@ void CMario::GetBoundingBox(float& left, float& top, float& right, float& bottom
 	}
 	else if (level == MARIO_LEVEL_FOX)
 	{
-		right = x + MARIO_FIRE_BBOX_WIDTH;
-		bottom = y + MARIO_FIRE_BBOX_HEIGHT;
+		right = x + MARIO_FOX_BBOX_WIDTH;
+		bottom = y + MARIO_FOX_BBOX_HEIGHT;
 	}
 	if (sit == true)
 	{

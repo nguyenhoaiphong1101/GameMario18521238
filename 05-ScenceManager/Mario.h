@@ -4,9 +4,14 @@
 #define MARIO_WALKING_SPEED		0.15f 
 #define MARIO_WALKING_SPEED_PLUS		0.002f 
 #define MARIO_WALKING_SPEED_PLUS1		0.0025f 
+#define MARIO_WALKING_RUN_MAX		0.25f 
+#define MARIO_WALKING_FLY	0.1f 
+#define MARIO_GEARING_MAX	0.051f
 
-//0.1f
+
+
 #define MARIO_JUMP_SPEED_Y		0.5f
+#define MARIO_JUMP_SPEED_Y_HIGH		0.625f
 #define MARIO_JUMP_DEFLECT_SPEED 0.2f
 #define MARIO_GRAVITY			0.002f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
@@ -20,6 +25,7 @@
 #define MARIO_STATE_JUMP_HIGH			310
 #define MARIO_STATE_DIE				400
 #define MARIO_STATE_SHOOT_FIRE				500
+#define MARIO_STATE_FLY				501
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -61,8 +67,8 @@
 #define MARIO_ANI_FOX_WALKING_LEFT		38
 #define MARIO_ANI_FOX_RUN_RIGHT		39
 #define MARIO_ANI_FOX_RUN_LEFT		40
-#define MARIO_ANI_FOX_FLY_RIGHT		41
-#define MARIO_ANI_FOX_FLY_LEFT		42
+#define MARIO_ANI_FOX_JUMP_RIGHT		41
+#define MARIO_ANI_FOX_JUMP_LEFT		42
 #define MARIO_ANI_FOX_GEARING_RIGHT		43 
 #define MARIO_ANI_FOX_GEARING_LEFT		44 
 #define MARIO_ANI_FOX_ATTACK		45 
@@ -76,6 +82,8 @@
 #define MARIO_ANI_BIG_HOLDKOOPAS_LEFT		53 
 #define MARIO_ANI_BIG_HOLDKOOPAS_WALK_RIGHT		54
 #define MARIO_ANI_BIG_HOLDKOOPAS_WALK_LEFT		55 
+#define MARIO_ANI_FOX_FLY_RIGHT		56
+#define MARIO_ANI_FOX_FLY_LEFT		57 
 
 
 #define MARIO_ANI_DIE				8
@@ -96,6 +104,9 @@
 #define MARIO_SMALL_BBOX_WIDTH  13
 #define MARIO_SMALL_BBOX_HEIGHT 15
 
+#define MARIO_FOX_BBOX_WIDTH  21
+#define MARIO_FOX_BBOX_HEIGHT 27
+
 #define MARIO_UNTOUCHABLE_TIME 5000
 
 #define MARIO_TYPE 101
@@ -111,11 +122,14 @@ class CMario : public CGameObject
 	float start_y;
 	
 public: 
-	int checkjumping = 0;
-	bool checkidle = true;
-	bool attack = false;
-	bool sit = false;
-	bool holdKoopas = false;
+	int checkjumping = 0;//kiểm tra trạng thái nhảy
+	bool checkidle = true;//kiểm tra trạng thái đứng im
+	bool attack = false;//trạng thái tấn công
+	bool sit = false;//trạng thái ngồi
+	bool holdKoopas = false;//trạng thái giữ rùa
+	bool flyCan = false;//trạng thái bay
+	int startRun = 0;//kiểm tra thời gian có thể bay
+	int timeFly = 0;//kiểm tra thời gian bay
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);

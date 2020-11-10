@@ -277,7 +277,7 @@ void CPlayScene::Update(DWORD dt)
 
 
 	vector<LPGAMEOBJECT> coObjects;
-	for (size_t i = 1; i < objects.size(); i++)
+	for (size_t i = 0; i < objects.size(); i++)
 	{
 		coObjects.push_back(objects[i]);
 	}
@@ -298,12 +298,14 @@ void CPlayScene::Update(DWORD dt)
 
 	CGame *game = CGame::GetInstance();	
 	cx -= game->GetScreenWidth() / 2;
-	cy -= game->GetScreenHeight() / 2;
+	//cy -= game->GetScreenHeight() / 2;
 
 	if (player->x <= (game->GetScreenWidth() / 2)) cx = 0;
-	if (player->y > (game->GetScreenHeight() / 2)) cy = 0;//Lúc đầu nó cam k di chuyển đến khi mario qa nửa màn hình
+	if (player->y >= -46 )
+		cy = -46;
+	else cy -= game->GetScreenHeight() / 2;
 
-	CGame::GetInstance()->SetCamPos(cx, -46);
+	CGame::GetInstance()->SetCamPos((int)cx, cy);
 }
 
 void CPlayScene::Render()
@@ -341,7 +343,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_SPACE:
 		if (mario->checkjumping == 0)
 		{
-			if (game->IsKeyDown(DIK_LSHIFT))
+			if (mario->startRun != 0 && GetTickCount() - mario->startRun > 1000 && mario->GetLevel()==MARIO_LEVEL_FOX)
+			{
+				mario->flyCan = true;
+				mario->SetState(MARIO_STATE_FLY);
+				mario->timeFly = GetTickCount();
+			}
+			else if (game->IsKeyDown(DIK_LSHIFT))
 			{
 				mario->SetState(MARIO_STATE_JUMP_HIGH);
 			}else
@@ -353,6 +361,10 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_R: 
 		mario->attack=true;
+		break;
+	case DIK_Z: 
+		if(mario->vx != 0)
+		mario->startRun=GetTickCount();
 		break;
 	case DIK_S:
 		mario->holdKoopas = true;
@@ -389,10 +401,18 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	case DIK_S:
 		mario->holdKoopas = false;
 		break;
+	case DIK_SPACE:
+		mario->flyCan = false;
+		mario->timeFly = 0;
+		mario->startRun = 0;
+		break;
 	case DIK_DOWN:
 		mario->sit = false;
 		if(mario->GetLevel()!= MARIO_LEVEL_SMALL)
 		mario->y -= MARIO_SIT_BBOX_HEIGHT;
+		break;
+	case DIK_Z:
+		mario->startRun = 0;
 		break;
 	default:
 		break;
