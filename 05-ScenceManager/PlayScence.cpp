@@ -402,9 +402,15 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		mario->holdKoopas = false;
 		break;
 	case DIK_SPACE:
+		if (mario->flyCan == true)
+		{
+			mario->SetState(MARIO_STATE_LANDING);
+			mario->landingCheck = true;
+		}
 		mario->flyCan = false;
 		mario->timeFly = 0;
 		mario->startRun = 0;
+		
 		break;
 	case DIK_DOWN:
 		mario->sit = false;

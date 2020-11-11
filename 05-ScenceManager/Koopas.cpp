@@ -1,4 +1,7 @@
 #include "Koopas.h"
+#include "Box.h"
+#include "Drain.h"
+#include "Brick.h"
 #include "Mario.h"
 #include "PlayScence.h"
 #include "Game.h"
@@ -22,7 +25,7 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 	{
 		left = top = right = bottom = 0;
 	}
-	
+
 
 }
 
@@ -34,9 +37,10 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	CGameObject::Update(dt);
 
-	if(state != KOOPAS_STATE_HOLD)
-	vy += dt * KOOPAS_GRAVITY;
-	
+	if (state != KOOPAS_STATE_HOLD)
+		vy += dt * KOOPAS_GRAVITY;
+
+
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -64,20 +68,55 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
-		if(state != KOOPAS_STATE_DIE && state != KOOPAS_STATE_THROW && state != KOOPAS_STATE_HIDE)
-		{ 
+		if (state != KOOPAS_STATE_DIE && state != KOOPAS_STATE_THROW && state != KOOPAS_STATE_HIDE)
+		{
 			x += min_tx * dx + nx * 0.4f;
+			if(nx <0)
 			y += min_ty * dy + ny * 0.4f;
-			
+
 		}
 		if (ny != 0) vy = 0;
 		//
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
-			if (nx != 0)
+			/*if (e->nx != 0)
 			{
 				vx = -vx;
+			}*/
+			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
+			{
+				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
+
+				if (state == KOOPAS_STATE_THROW)
+				{
+					if (goomba->GetState() != GOOMBA_STATE_DIE)
+					{
+						goomba->SetState(GOOMBA_STATE_DIE_DOWN);
+					}
+				}
+			}
+			if (dynamic_cast<CBox*>(e->obj)) // if e->obj is Goomba 
+			{
+				if (e->nx != 0)
+				{
+					x += dx;
+				}
+			}
+			if (dynamic_cast<CDrain*>(e->obj))
+			{
+				if (e->nx != 0)
+				{
+					vx = -vx;
+				}
+			}
+			if (dynamic_cast<CBrick*>(e->obj))
+			{
+				
+				if (nx != 0 )
+				{
+					vx = -vx;
+				}
 			}
 		}
 	}
@@ -91,24 +130,41 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		if (mario->holdKoopas == true)
 		{
-			if (mario->nx > 0)
+			if (mario->GetLevel() != MARIO_LEVEL_SMALL)
 			{
-				x = mario->x + MARIO_BIG_BBOX_WIDTH;
-				y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+				if (mario->nx > 0)
+				{
+					x = mario->x + MARIO_BIG_BBOX_WIDTH;
+					y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+				}
+				else
+				{
+					x = mario->x - KOOPAS_BBOX_WIDTH;
+					y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+				}
 			}
 			else
 			{
-				x = mario->x - KOOPAS_BBOX_WIDTH;
-				y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+				if (mario->nx > 0)
+				{
+					x = mario->x + MARIO_BIG_BBOX_WIDTH;
+					y = mario->y - MARIO_BIG_BBOX_HEIGHT / 5;
+				}
+				else
+				{
+					x = mario->x - KOOPAS_BBOX_WIDTH;
+					y = mario->y - MARIO_BIG_BBOX_HEIGHT / 5;
+				}
 			}
+
 		}
 		else
 		{
 			SetState(KOOPAS_STATE_THROW);
 		}
-			
+
 	}
-	
+
 }
 
 void CKoopas::Render()
@@ -117,19 +173,20 @@ void CKoopas::Render()
 	if (state == KOOPAS_STATE_HOLD)
 	{
 		ani = KOOPAS_ANI_DIE;
-	}else
-	if (state == KOOPAS_STATE_DIE) {
-		if (vx != 0)
-			ani = KOOPAS_ANI_TURN;
-		else
-		ani = KOOPAS_ANI_DIE;
 	}
-	else if (state == KOOPAS_STATE_THROW)
-	{
+	else
+		if (state == KOOPAS_STATE_DIE) {
+			if (vx != 0)
+				ani = KOOPAS_ANI_TURN;
+			else
+				ani = KOOPAS_ANI_DIE;
+		}
+		else if (state == KOOPAS_STATE_THROW)
+		{
 			ani = KOOPAS_ANI_TURN;
-	}
-	else if (vx > 0) ani = KOOPAS_ANI_WALKING_RIGHT;
-	else if (vx < 0) ani = KOOPAS_ANI_WALKING_LEFT;
+		}
+		else if (vx > 0) ani = KOOPAS_ANI_WALKING_RIGHT;
+		else if (vx < 0) ani = KOOPAS_ANI_WALKING_LEFT;
 
 	animation_set->at(ani)->Render(x, y);
 
@@ -139,7 +196,7 @@ void CKoopas::SetState(int state)
 {
 	LPSCENE scence = CGame::GetInstance()->GetCurrentScene();
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
-	
+
 	CGameObject::SetState(state);
 	switch (state)
 	{

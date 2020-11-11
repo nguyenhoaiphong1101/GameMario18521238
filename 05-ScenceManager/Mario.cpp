@@ -44,8 +44,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGameObject::Update(dt);
 
 	// Simple fall down
-	if(flyCan == false)
+	if(flyCan == false && landingCheck == false)
 	vy += MARIO_GRAVITY * dt;
+	
+	
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -99,6 +101,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (e->ny < 0)
 			{
 				checkjumping = 0;
+				landingCheck = false;
 			}
 
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
@@ -263,6 +266,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (timeFly != 0 && GetTickCount() - timeFly > 3000)
 	{
 		flyCan = false;
+		
 		timeFly = 0;
 	}
 	// clean up collision events
@@ -457,6 +461,25 @@ void CMario::Render()
 					ani = MARIO_ANI_SMALL_FLY_LEFT;
 				else ani = MARIO_ANI_SMALL_FLY_RIGHT;
 			}
+			if (holdKoopas == true)
+			{
+				if (vx == 0)
+				{
+					if (nx > 0)
+						ani = MARIO_ANI_SMALL_HOLDKOOPAS_RIGHT;
+					else
+						ani = MARIO_ANI_SMALL_HOLDKOOPAS_LEFT;
+				}
+				else
+				{
+					if (vx > 0)
+						ani = MARIO_ANI_SMALL_HOLDKOOPAS_WALK_RIGHT;
+					else
+						ani = MARIO_ANI_SMALL_HOLDKOOPAS_WALK_LEFT;
+				}
+
+
+			}
 		}
 		else if (level == MARIO_LEVEL_FIRE)
 		{
@@ -543,6 +566,23 @@ void CMario::Render()
 				else
 					ani = MARIO_ANI_FIRE_SIT_LEFT;
 			}
+			if (holdKoopas == true)
+			{
+				if (vx == 0)
+				{
+					if (nx > 0)
+						ani = MARIO_ANI_FIRE_HOLDKOOPAS_RIGHT;
+					else
+						ani = MARIO_ANI_FIRE_HOLDKOOPAS_LEFT;
+				}
+				else
+				{
+					if (vx > 0)
+						ani = MARIO_ANI_FIRE_HOLDKOOPAS_WALK_RIGHT;
+					else
+						ani = MARIO_ANI_FIRE_HOLDKOOPAS_WALK_LEFT;
+				}
+			}
 		}
 		else if (level == MARIO_LEVEL_FOX)
 		{
@@ -625,21 +665,45 @@ void CMario::Render()
 			{
 				ani = MARIO_ANI_FOX_ATTACK;
 			}
-			
-			if (flyCan == true)
+			else if (holdKoopas == true)
+			{
+				if (vx == 0)
+				{
+					if (nx > 0)
+						ani = MARIO_ANI_FOX_HOLDKOOPAS_RIGHT;
+					else
+						ani = MARIO_ANI_FOX_HOLDKOOPAS_LEFT;
+				}
+				else
+				{
+					if (vx > 0)
+						ani = MARIO_ANI_FOX_HOLDKOOPAS_WALK_RIGHT;
+					else
+						ani = MARIO_ANI_FOX_HOLDKOOPAS_WALK_LEFT;
+				}
+			}
+			else if (flyCan == true)
 			{
 				if (nx > 0)
 					ani = MARIO_ANI_FOX_FLY_RIGHT;
 				else
 					ani = MARIO_ANI_FOX_FLY_LEFT;
-			} else
-			if (sit == true)
+			}
+			else if (landingCheck == true)
+			{
+				if (nx > 0)
+					ani = MARIO_ANI_FOX_LANDING_RIGHT;
+				else
+					ani = MARIO_ANI_FOX_LANDING_LEFT;
+			}
+			else if (sit == true)
 			{
 				if (nx > 0)
 					ani = MARIO_ANI_FOX_SIT_RIGHT;
 				else
 					ani = MARIO_ANI_FOX_SIT_LEFT;
 			}
+			
 		}
 
 
@@ -688,7 +752,11 @@ void CMario::SetState(int state)
 		vx = 0;
 		break;
 	case MARIO_STATE_FLY:
-		vy -= MARIO_WALKING_FLY;
+		vy = -MARIO_WALKING_FLY;
+		checkjumping = 1;
+		break;
+	case MARIO_STATE_LANDING:
+		vy = MARIO_WALKING_FLY;
 		checkjumping = 1;
 		break;
 

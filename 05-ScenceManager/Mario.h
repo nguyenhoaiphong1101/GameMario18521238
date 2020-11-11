@@ -14,6 +14,7 @@
 #define MARIO_JUMP_SPEED_Y_HIGH		0.625f
 #define MARIO_JUMP_DEFLECT_SPEED 0.2f
 #define MARIO_GRAVITY			0.002f
+#define MARIO_GRAVITY_FOX			0.0005f
 #define MARIO_DIE_DEFLECT_SPEED	 0.5f
 
 #define MARIO_STATE_IDLE			0
@@ -26,6 +27,7 @@
 #define MARIO_STATE_DIE				400
 #define MARIO_STATE_SHOOT_FIRE				500
 #define MARIO_STATE_FLY				501
+#define MARIO_STATE_LANDING				502
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -84,6 +86,20 @@
 #define MARIO_ANI_BIG_HOLDKOOPAS_WALK_LEFT		55 
 #define MARIO_ANI_FOX_FLY_RIGHT		56
 #define MARIO_ANI_FOX_FLY_LEFT		57 
+#define MARIO_ANI_FOX_LANDING_RIGHT		58
+#define MARIO_ANI_FOX_LANDING_LEFT		59 
+#define MARIO_ANI_FIRE_HOLDKOOPAS_RIGHT		60
+#define MARIO_ANI_FIRE_HOLDKOOPAS_LEFT		61 
+#define MARIO_ANI_FIRE_HOLDKOOPAS_WALK_RIGHT		62
+#define MARIO_ANI_FIRE_HOLDKOOPAS_WALK_LEFT		63 
+#define MARIO_ANI_FOX_HOLDKOOPAS_RIGHT		64
+#define MARIO_ANI_FOX_HOLDKOOPAS_LEFT		65 
+#define MARIO_ANI_FOX_HOLDKOOPAS_WALK_RIGHT		66
+#define MARIO_ANI_FOX_HOLDKOOPAS_WALK_LEFT		67 
+#define MARIO_ANI_SMALL_HOLDKOOPAS_RIGHT		68
+#define MARIO_ANI_SMALL_HOLDKOOPAS_LEFT		69 
+#define MARIO_ANI_SMALL_HOLDKOOPAS_WALK_RIGHT		70
+#define MARIO_ANI_SMALL_HOLDKOOPAS_WALK_LEFT		71 
 
 
 #define MARIO_ANI_DIE				8
@@ -117,6 +133,7 @@ class CMario : public CGameObject
 	int level;
 	int untouchable;
 	DWORD untouchable_start;
+	
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
@@ -130,6 +147,7 @@ public:
 	bool flyCan = false;//trạng thái bay
 	int startRun = 0;//kiểm tra thời gian có thể bay
 	int timeFly = 0;//kiểm tra thời gian bay
+	bool landingCheck = false;//kiểm tra hạ cánh
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
