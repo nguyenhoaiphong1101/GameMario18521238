@@ -256,14 +256,14 @@ void CPlayScene::Update(DWORD dt)
 		if (player->nx == 1)
 		{
 			obj->SetPosition(player->x + MARIO_FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
-			obj->vx = 0.15f;
+			obj->vx = FIRE_SPEED;
 			obj->nx = 1;
 			
 		}
 		else
 		{
 			obj->SetPosition(player->x - FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
-			obj->vx = -0.15f;
+			obj->vx = -FIRE_SPEED;
 			obj->nx = -1;
 			
 		}
@@ -362,6 +362,10 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_R: 
 		mario->attack=true;
 		break;
+	case DIK_H: 
+		if(mario->GetLevel() == MARIO_LEVEL_FOX)
+		mario->landingCheck=true;
+		break;
 	case DIK_Z: 
 		if(mario->vx != 0)
 		mario->startRun=GetTickCount();
@@ -419,6 +423,9 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		break;
 	case DIK_Z:
 		mario->startRun = 0;
+		break;
+	case DIK_H:
+		mario->landingCheck = false;
 		break;
 	default:
 		break;

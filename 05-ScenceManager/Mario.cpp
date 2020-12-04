@@ -159,7 +159,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 				else
-					if (holdKoopas == true)
+					if (holdKoopas == true && koopas -> GetState()== KOOPAS_STATE_DIE)
 					{
 						koopas->SetState(KOOPAS_STATE_HOLD);
 					}
@@ -222,12 +222,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 									{
 										if (nx > 0)
 										{
-											koopas->vx = -0.3f;
+											koopas->vx = -KOOPAS_RUN_SPEED;
 										}
 
 										else
 										{
-											koopas->vx = +0.3f;
+											koopas->vx = +KOOPAS_RUN_SPEED;
 										}
 
 									}
@@ -266,8 +266,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (timeFly != 0 && GetTickCount() - timeFly > 3000)
 	{
 		flyCan = false;
-		
+		landingCheck = true;
+		SetState(MARIO_STATE_LANDING);
 		timeFly = 0;
+	}
+	if (landingCheck == true)
+	{
+		SetState(MARIO_STATE_LANDING);
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];

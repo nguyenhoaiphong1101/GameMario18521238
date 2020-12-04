@@ -51,7 +51,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state != KOOPAS_STATE_HOLD && state != KOOPAS_STATE_HIDE)
 		CalcPotentialCollisions(coObjects, coEvents);
 
-
+	float tempy=y+dy;
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
 	{
@@ -96,11 +96,15 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 			}
-			if (dynamic_cast<CBox*>(e->obj)) // if e->obj is Goomba 
+			if (dynamic_cast<CBox*>(e->obj))
 			{
 				if (e->nx != 0)
 				{
 					x += dx;
+				}
+				if (e->ny > 0)
+				{
+					y = tempy;
 				}
 			}
 			if (dynamic_cast<CDrain*>(e->obj))
