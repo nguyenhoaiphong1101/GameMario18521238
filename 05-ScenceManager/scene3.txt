@@ -8,10 +8,14 @@
 50	textures\enemies-2.png	0	128	128
 60	textures\enemies-3.png	255	255	255
 70	textures\map1-1.png	156	252	240
+80	textures\HUD.png	255	0	255
+90	textures\black.png	0	0	0
 
 
 # id	left	top	right	bottom	texture_id
 [SPRITES]
+#background black
+1	0	0	380	84	90	
 #Mario hàng 1
 1001	6	0	30	16	0
 1002	36	0	49	16	0
