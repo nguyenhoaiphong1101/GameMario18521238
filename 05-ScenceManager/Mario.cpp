@@ -276,6 +276,19 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
+	float cx, cy;
+	GetPosition(cx, cy);
+
+	CGame* game = CGame::GetInstance();
+	cx -= game->GetScreenWidth() / 2;
+	//cy -= game->GetScreenHeight() / 2;
+
+	if (x <= (game->GetScreenWidth() / 2)) cx = 0;
+	if (y >= -46)
+		cy = -10;
+	else cy -= game->GetScreenHeight() / 2;
+
+	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
 }
 
 void CMario::Render()
@@ -719,6 +732,8 @@ void CMario::Render()
 	animation_set->at(ani)->Render(x, y, alpha);
 
 	/*RenderBoundingBox();*/
+
+	
 }
 
 void CMario::SetState(int state)

@@ -102,10 +102,6 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					x += dx;
 				}
-				if (e->ny > 0)
-				{
-					y = tempy;
-				}
 			}
 			if (dynamic_cast<CDrain*>(e->obj))
 			{
@@ -151,12 +147,12 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				if (mario->nx > 0)
 				{
-					x = mario->x + MARIO_BIG_BBOX_WIDTH;
+					x = mario->x + MARIO_BIG_BBOX_WIDTH + 2;
 					y = mario->y - MARIO_BIG_BBOX_HEIGHT / 5;
 				}
 				else
 				{
-					x = mario->x - KOOPAS_BBOX_WIDTH;
+					x = mario->x - KOOPAS_BBOX_WIDTH - 3;
 					y = mario->y - MARIO_BIG_BBOX_HEIGHT / 5;
 				}
 			}

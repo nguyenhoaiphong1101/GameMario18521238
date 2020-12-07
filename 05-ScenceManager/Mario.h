@@ -139,15 +139,15 @@ class CMario : public CGameObject
 	float start_y;
 	
 public: 
-	int checkjumping = 0;//kiểm tra trạng thái nhảy
-	bool checkidle = true;//kiểm tra trạng thái đứng im
-	bool attack = false;//trạng thái tấn công
-	bool sit = false;//trạng thái ngồi
-	bool holdKoopas = false;//trạng thái giữ rùa
-	bool flyCan = false;//trạng thái bay
-	int startRun = 0;//kiểm tra thời gian có thể bay
-	int timeFly = 0;//kiểm tra thời gian bay
-	bool landingCheck = false;//kiểm tra hạ cánh
+	int checkjumping = 0;	//kiểm tra trạng thái nhảy
+	bool checkidle = true;	//kiểm tra trạng thái đứng im
+	bool attack = false;	//trạng thái tấn công
+	bool sit = false;	//trạng thái ngồi
+	bool holdKoopas = false;	//trạng thái giữ rùa
+	bool flyCan = false;	//trạng thái bay
+	int startRun = 0;	//kiểm tra thời gian có thể bay
+	int timeFly = 0;	//kiểm tra thời gian bay
+	bool landingCheck = false;	//kiểm tra hạ cánh
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
@@ -162,4 +162,13 @@ public:
 	void Reset();
 
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
+
+	int GetSpeed()
+	{
+		return 0;
+	}
+	int GetCoinCounter() { return 0; };
+	void CoinCounterUp() { /*CoinCounter++;*/ };
+	long GetScore() { return 0; };
+	long GetLife() { return 0; };
 };

@@ -38,6 +38,8 @@ class CGame
 	float cam_x = 0.0f;
 	float cam_y = 0.0f;
 
+	int gameTime = 300;
+
 	int screen_width;
 	int screen_height; 
 
@@ -48,6 +50,9 @@ class CGame
 	void _ParseSection_SCENES(string line);
 
 public:
+	float GetCamPosX() { return cam_x; };
+	float GetCamPosY() { return cam_y; };
+	int GetGameTime() { return gameTime; };
 	void InitKeyboard();
 	void SetKeyHandler(LPKEYEVENTHANDLER handler) { keyHandler = handler; }
 	void Init(HWND hWnd);
@@ -83,6 +88,7 @@ public:
 	LPD3DXSPRITE GetSpriteHandler() { return this->spriteHandler; }
 
 	void SetCamPos(float x, float y) { cam_x = x; cam_y = y; }
+	
 
 	static CGame * GetInstance();
 

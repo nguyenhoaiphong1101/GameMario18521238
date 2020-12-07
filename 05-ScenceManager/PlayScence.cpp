@@ -10,6 +10,9 @@
 #include "Box.h"
 #include "Drain.h"
 #include "Fire.h"
+#include "HUD.h"
+
+
 
 
 
@@ -40,6 +43,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_NOCOLLISION	4
 #define OBJECT_TYPE_BOX	5
 #define OBJECT_TYPE_DRAIN	6
+#define OBJECT_TYPE_HUD	7
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -172,6 +176,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_NOCOLLISION: obj = new CNoCollision() ; break;
 	case OBJECT_TYPE_BOX: obj = new CBox() ; break;
 	case OBJECT_TYPE_DRAIN: obj = new CDrain() ; break;
+	case OBJECT_TYPE_HUD: obj = new HUD(); break;
+
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());
@@ -293,19 +299,7 @@ void CPlayScene::Update(DWORD dt)
 	if (player->x < 0) player->x = 0; //Chống lùi qa trái
 
 	// Update camera to follow mario
-	float cx, cy;
-	player->GetPosition(cx, cy);
-
-	CGame *game = CGame::GetInstance();	
-	cx -= game->GetScreenWidth() / 2;
-	//cy -= game->GetScreenHeight() / 2;
-
-	if (player->x <= (game->GetScreenWidth() / 2)) cx = 0;
-	if (player->y >= -46 )
-		cy = -46;
-	else cy -= game->GetScreenHeight() / 2;
-
-	CGame::GetInstance()->SetCamPos((int)cx, 0);
+	
 }
 
 void CPlayScene::Render()
