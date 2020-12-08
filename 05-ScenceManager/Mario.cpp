@@ -81,19 +81,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		// TODO: This is a very ugly designed function!!!!
 		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
 
-		// how to push back Mario if collides with a moving objects, what if Mario is pushed this way into another object?
-		//if (rdx != 0 && rdx!=dx)
-		//	x += nx*abs(rdx); 
-
 
 		//// block every object first!
 		x += min_tx * dx + nx * 0.4f;
 		y += min_ty * dy + ny * 0.4f;
-		/*if (ny != 0) vy = 0;*/
-		//
-		// Collision logic with other objects
-		//
 
+		// Collision logic with other objects
 		for (UINT i = 0; i < coEventsResult.size(); i++)
 		{
 			LPCOLLISIONEVENT e = coEventsResult[i];
@@ -123,6 +116,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						{
 							goomba->SetState(GOOMBA_STATE_DIE);
 							vy = -MARIO_JUMP_DEFLECT_SPEED;
+							marioScore += MARIO_SCORE;
 						}
 					}
 					else if (e->nx != 0)
@@ -143,7 +137,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 										StartUntouchable();
 									}
 									else
+									{
 										SetState(MARIO_STATE_DIE);
+									}
 							}
 						}
 					}
@@ -168,6 +164,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						{
 							if (koopas->GetState() != KOOPAS_STATE_DIE)
 							{
+								if(koopas->GetState() != KOOPAS_STATE_THROW)
+								marioScore += MARIO_SCORE;
 								koopas->SetState(KOOPAS_STATE_DIE);
 								vy = -MARIO_JUMP_DEFLECT_SPEED;
 							}
@@ -178,7 +176,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						}
 						else if (e->nx != 0)
 						{
-
 							if (untouchable == 0)
 							{
 								if (koopas->GetState() != KOOPAS_STATE_DIE)
@@ -195,7 +192,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 											StartUntouchable();
 										}
 										else
+										{
 											SetState(MARIO_STATE_DIE);
+										}
 								}
 								else
 								{
@@ -214,7 +213,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 												StartUntouchable();
 											}
 											else
+											{
 												SetState(MARIO_STATE_DIE);
+											}
 										}
 
 									}
@@ -274,6 +275,30 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		SetState(MARIO_STATE_LANDING);
 	}
+
+	if (startRun != 0)
+	{
+		if (GetTickCount() - startRun > 200)
+		{
+			if (levelFly < 7)
+			{
+				levelFly++;
+			}
+			startRun = 0;
+		}
+	}
+	if (stopRun != 0 || landingCheck == true)
+	{
+		if (GetTickCount() - stopRun > 200)
+		{
+			if (levelFly >= 0)
+			{
+				levelFly--;
+			}
+			stopRun = GetTickCount();
+		}
+	}
+	
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	float cx, cy;
@@ -289,6 +314,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	else cy -= game->GetScreenHeight() / 2;
 
 	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
+
+	
+
 }
 
 void CMario::Render()
@@ -787,25 +815,27 @@ void CMario::SetState(int state)
 	case MARIO_STATE_WALKING_RIGHT_FAST:
 		if (vx < MARIO_WALKING_RUN_MAX)
 		{
-			if (vx < -0.05)//giới hạn tốc độ để mario lấy đà mượt hơn
-				vx = -0.04;
+			if (vx < -LANDING_LIMIT)//giới hạn tốc độ để mario lấy đà mượt hơn
+				vx = -LANDING_LIMIT_SPEED;
 			else
 			{
 				vx += MARIO_WALKING_SPEED_PLUS;
 			}
 		}
+
 		nx = 1;
 		break;
 	case MARIO_STATE_WALKING_LEFT_FAST:
 		if (vx > -MARIO_WALKING_RUN_MAX)
 		{
-			if (vx > 0.05)
-				vx = 0.04;
+			if (vx > LANDING_LIMIT)
+				vx = LANDING_LIMIT_SPEED;
 			else
 			{
 				vx -= MARIO_WALKING_SPEED_PLUS;
 			}
 		}
+
 		nx = -1;
 		break;
 	case MARIO_STATE_JUMP_HIGH:

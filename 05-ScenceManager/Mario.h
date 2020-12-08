@@ -1,4 +1,4 @@
-﻿	#pragma once
+﻿#pragma once
 #include "GameObject.h"
 
 #define MARIO_WALKING_SPEED		0.15f 
@@ -127,18 +127,28 @@
 
 #define MARIO_TYPE 101
 
+#define MARIO_SCORE 101
+#define LANDING_LIMIT 0.05
+#define LANDING_LIMIT_SPEED 0.04
+
+#define MARIO_SCORE 100
+
 
 class CMario : public CGameObject
 {
 	int level;
 	int untouchable;
 	DWORD untouchable_start;
-	
+	int marioScore = 0;
+	int marioCoin = 0;
+	int marioLife = 3;
+	int levelFly = 0;
+
 
 	float start_x;			// initial position of Mario at scene
 	float start_y;
-	
-public: 
+
+public:
 	int checkjumping = 0;	//kiểm tra trạng thái nhảy
 	bool checkidle = true;	//kiểm tra trạng thái đứng im
 	bool attack = false;	//trạng thái tấn công
@@ -146,11 +156,12 @@ public:
 	bool holdKoopas = false;	//trạng thái giữ rùa
 	bool flyCan = false;	//trạng thái bay
 	int startRun = 0;	//kiểm tra thời gian có thể bay
+	int stopRun = 0;	//kiểm tra thời gian có thể bay
 	int timeFly = 0;	//kiểm tra thời gian bay
 	bool landingCheck = false;	//kiểm tra hạ cánh
 
 	CMario(float x = 0.0f, float y = 0.0f);
-	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *colliable_objects = NULL);
+	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
 	virtual void Render();
 
 	int GetCheckJumping() { return checkjumping; };
@@ -161,14 +172,33 @@ public:
 
 	void Reset();
 
-	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
+	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
+
+	void SetLifeDown() { marioLife--; };
+	void SetLifeUp() { marioLife++; };
 
 	int GetSpeed()
 	{
-		return 0;
-	}
-	int GetCoinCounter() { return 0; };
-	void CoinCounterUp() { /*CoinCounter++;*/ };
-	long GetScore() { return 0; };
-	long GetLife() { return 0; };
+		return levelFly;
+	};
+	int GetCoin()
+	{
+		return marioCoin;
+	};
+	void CoinUp()
+	{
+		marioCoin++;
+	};
+	void ScoreUp()
+	{
+		marioScore+=100;
+	};
+	double GetScore()
+	{
+		return marioScore;
+	};
+	double GetLife()
+	{
+		return marioLife;
+	};
 };

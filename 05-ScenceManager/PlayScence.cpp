@@ -337,7 +337,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	case DIK_SPACE:
 		if (mario->checkjumping == 0)
 		{
-			if (mario->startRun != 0 && GetTickCount() - mario->startRun > 1000 && mario->GetLevel()==MARIO_LEVEL_FOX)
+			if (mario->GetSpeed()==7 && mario->GetLevel()==MARIO_LEVEL_FOX)
 			{
 				mario->flyCan = true;
 				mario->SetState(MARIO_STATE_FLY);
@@ -346,8 +346,12 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 			else if (game->IsKeyDown(DIK_LSHIFT))
 			{
 				mario->SetState(MARIO_STATE_JUMP_HIGH);
-			}else
-			mario->SetState(MARIO_STATE_JUMP);
+			}
+			else
+			{
+				mario->SetState(MARIO_STATE_JUMP);
+			}
+			
 		}
 		break;
 	case DIK_A: 
@@ -360,10 +364,6 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		if(mario->GetLevel() == MARIO_LEVEL_FOX)
 		mario->landingCheck=true;
 		break;
-	case DIK_Z: 
-		if(mario->vx != 0)
-		mario->startRun=GetTickCount();
-		break;
 	case DIK_S:
 		mario->holdKoopas = true;
 		break;
@@ -375,6 +375,9 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		break;
 	case DIK_O:
 		mario->SetLevel(MARIO_LEVEL_FOX);
+		break;
+	case DIK_Z:
+		
 		break;
 	case DIK_L:
 		if (mario->GetLevel() == MARIO_LEVEL_FIRE)
@@ -407,20 +410,26 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		}
 		mario->flyCan = false;
 		mario->timeFly = 0;
-		mario->startRun = 0;
-		
 		break;
 	case DIK_DOWN:
 		mario->sit = false;
 		if(mario->GetLevel()!= MARIO_LEVEL_SMALL)
 		mario->y -= MARIO_SIT_BBOX_HEIGHT;
 		break;
-	case DIK_Z:
-		mario->startRun = 0;
-		break;
 	case DIK_H:
 		mario->landingCheck = false;
 		break;
+	
+	case DIK_Z:
+			mario->stopRun = GetTickCount();
+			mario->startRun = 0;
+	case DIK_RIGHT:
+			mario->stopRun = GetTickCount();
+			mario->startRun = 0;
+	case DIK_LEFT:
+			mario->stopRun = GetTickCount();
+			mario->startRun = 0;
+			
 	default:
 		break;
 	}
@@ -440,16 +449,32 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 		if (game->IsKeyDown(DIK_Z))
 		{
 			mario->SetState(MARIO_STATE_WALKING_RIGHT_FAST);
+			if (mario->vx != 0)
+			{
+				if (mario->startRun == 0)
+				{
+					mario->startRun = GetTickCount();
+					mario->stopRun = 0;
+				}
+				
+			}
 		}
 		else
 		mario->SetState(MARIO_STATE_WALKING_RIGHT);
-
 	}
 	else if (game->IsKeyDown(DIK_LEFT))
 	{
 		if (game->IsKeyDown(DIK_Z))
 		{
 			mario->SetState(MARIO_STATE_WALKING_LEFT_FAST);
+			if (mario->vx != 0)
+			{
+				if (mario->startRun == 0)
+				{
+					mario->startRun = GetTickCount();
+					mario->stopRun = 0;
+				}
+			}
 		}
 		else
 			mario->SetState(MARIO_STATE_WALKING_LEFT);

@@ -47,7 +47,7 @@ class HUD : public CGameObject
 	int marioScore = 0;	//Điểm
 	int marioCoin = 0;	//Tiền
 	int marioWorld = 1;	//Tên cảnh đang chơi
-	int tempTime = 0;	
+	int tempTime = 0;
 
 public:
 	HUD();

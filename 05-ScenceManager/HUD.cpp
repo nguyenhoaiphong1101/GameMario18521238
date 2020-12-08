@@ -37,7 +37,7 @@ HUD::HUD()
 	
 
 	storePowerNullStack = mario->GetSpeed();
-	marioCoin = mario->GetCoinCounter();
+	marioCoin = mario->GetCoin();
 	marioScore = mario->GetScore();
 	marioLife = mario->GetLife();
 
@@ -66,7 +66,7 @@ void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	tempTime += dt;
 	marioTime = game->GetGameTime() - tempTime / 1000;
 	storePowerNullStack = mario->GetSpeed();
-	marioCoin = mario->GetCoinCounter();
+	marioCoin = mario->GetCoin();
 	marioScore = mario->GetScore();
 	marioLife = mario->GetLife();
 	
