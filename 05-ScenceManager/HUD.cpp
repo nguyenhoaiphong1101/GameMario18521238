@@ -6,7 +6,7 @@
 #include <string>
 
 
-HUD::HUD()
+CHUD::CHUD()
 {
 	CGame* game = CGame::GetInstance();
 	CMario* mario = ((CPlayScene*)game->GetCurrentScene())->GetPlayer();
@@ -44,18 +44,18 @@ HUD::HUD()
 
 }
 
-void HUD::resetHUD()
+void CHUD::resetHUD()
 {
 
 }
 
 
-void HUD::GetBoundingBox(float& l, float& t, float& r, float& b)
+void CHUD::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
 
 }
 
-void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void CHUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGame* game = CGame::GetInstance();
 	SetPosition(game->GetCamPosX(), game->GetCamPosY() + 260);
@@ -102,7 +102,7 @@ void HUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	score = StringToSprite(stringScore);
 }
 
-void HUD::Render()
+void CHUD::Render()
 {
 
 	//draw a black background
@@ -144,7 +144,7 @@ void HUD::Render()
 
 }
 
-vector<LPSPRITE> HUD::StringToSprite(string str)
+vector<LPSPRITE> CHUD::StringToSprite(string str)
 {
 	vector<LPSPRITE> spritesVector;
 	LPSPRITE sprite;
@@ -159,7 +159,7 @@ vector<LPSPRITE> HUD::StringToSprite(string str)
 	return spritesVector;
 }
 
-LPSPRITE HUD::getHUD(char a)
+LPSPRITE CHUD::getHUD(char a)
 {
 	CSprites* number = CSprites::GetInstance();
 	switch (a)

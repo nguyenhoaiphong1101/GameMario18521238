@@ -12,6 +12,7 @@
 #include "Brick.h"
 #include "Drain.h"
 #include "Koopas.h"
+#include "Coin.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -24,17 +25,41 @@ CMario::CMario(float x, float y) : CGameObject()
 	this->y = y;
 }
 
-UINT checkCollBox(vector<LPCOLLISIONEVENT> a)
+void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLISIONEVENT>& coEventsResult, float& min_tx, float& min_ty, float& nx, float& ny, float& rdx, float& rdy)
 {
-	for (UINT i = 0; i < a.size(); i++)
+
+	min_tx = 1.0f;
+	min_ty = 1.0f;
+	int min_ix = -1;
+	int min_iy = -1;
+
+	nx = 0.0f;
+	ny = 0.0f;
+
+	coEventsResult.clear();
+
+	for (UINT i = 0; i < coEvents.size(); i++)
 	{
-		LPCOLLISIONEVENT e = a[i];
-		if (dynamic_cast<CBox*>(e->obj))
-		{
-			return i;
+		LPCOLLISIONEVENT c = coEvents[i];
+
+		if (c->t < min_tx && c->nx != 0) {
+			min_tx = c->t; nx = c->nx; min_ix = i; rdx = c->dx;
 		}
+
+		if (c->t < min_ty && c->ny != 0) {
+			min_ty = c->t; ny = c->ny; min_iy = i; rdy = c->dy;
+		}
+		if (dynamic_cast<CCoin*>(c->obj))
+		{
+			nx = 0;
+			ny = 0;
+		}
+		
+		
 	}
-	return -1;
+
+	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
+	if (min_iy >= 0) coEventsResult.push_back(coEvents[min_iy]);
 }
 
 
@@ -261,6 +286,14 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CPortal* p = dynamic_cast<CPortal*>(e->obj);
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
+			if (dynamic_cast<CCoin*>(e->obj)) // if e->obj is Coin
+			{
+				
+				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
+				coin->SetShow(false);
+				marioCoin++;
+				
+			}
 
 		}
 	}
@@ -270,6 +303,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		landingCheck = true;
 		SetState(MARIO_STATE_LANDING);
 		timeFly = 0;
+		levelFly = 0;
 	}
 	if (landingCheck == true)
 	{

@@ -11,6 +11,7 @@
 #include "Drain.h"
 #include "Fire.h"
 #include "HUD.h"
+#include "Coin.h"
 
 
 
@@ -44,6 +45,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_BOX	5
 #define OBJECT_TYPE_DRAIN	6
 #define OBJECT_TYPE_HUD	7
+#define OBJECT_TYPE_COIN	8
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -176,7 +178,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_NOCOLLISION: obj = new CNoCollision() ; break;
 	case OBJECT_TYPE_BOX: obj = new CBox() ; break;
 	case OBJECT_TYPE_DRAIN: obj = new CDrain() ; break;
-	case OBJECT_TYPE_HUD: obj = new HUD(); break;
+	case OBJECT_TYPE_HUD: obj = new CHUD(); break; 
+	case OBJECT_TYPE_COIN: obj = new CCoin(COIN); break;
 
 	case OBJECT_TYPE_PORTAL:
 		{	

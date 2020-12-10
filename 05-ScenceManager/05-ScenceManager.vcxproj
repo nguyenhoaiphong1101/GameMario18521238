@@ -128,6 +128,9 @@
     <ClCompile Include="Animations.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Brick.cpp" />
+    <ClCompile Include="BrickBroken.cpp" />
+    <ClCompile Include="BrickQuestion.cpp" />
+    <ClCompile Include="Coin.cpp" />
     <ClCompile Include="Drain.cpp" />
     <ClCompile Include="Fire.cpp" />
     <ClCompile Include="HUD.cpp" />
@@ -149,6 +152,9 @@
     <ClInclude Include="Animations.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Brick.h" />
+    <ClInclude Include="BrickBroken.h" />
+    <ClInclude Include="BrickQuestion.h" />
+    <ClInclude Include="Coin.h" />
     <ClInclude Include="Drain.h" />
     <ClInclude Include="Fire.h" />
     <ClInclude Include="HUD.h" />

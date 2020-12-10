@@ -25,7 +25,7 @@
 #define HUD_9_SPRITE	90121
 #define HUD_BACKGROUND_SPRITE	90148
 
-class HUD : public CGameObject
+class CHUD : public CGameObject
 {
 	//Sprite HUD
 	LPSPRITE backgroundBlack;	//Nền đen
@@ -50,7 +50,7 @@ class HUD : public CGameObject
 	int tempTime = 0;
 
 public:
-	HUD();
+	CHUD();
 	
 
 	virtual void Render();
