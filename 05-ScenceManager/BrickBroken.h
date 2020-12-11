@@ -17,7 +17,7 @@ public:
 	virtual void Render();
 	int GetStatus() { return status; };
 	int SetStatus(int status) { this->status = status; };
-	void TimeStart() { timeStart = GetTickCount() };
+	void TimeStart() { timeStart = GetTickCount(); };
 
 };
 

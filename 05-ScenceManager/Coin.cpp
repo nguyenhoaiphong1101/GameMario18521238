@@ -35,21 +35,6 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	y += dy;
 	if (!show) return;
 
-	/*if (state == COIN_STATE_UP)
-	{
-		if (GetTickCount() - timing_start >= TIME_COIN_ON_AIR)
-		{
-			SetState(COIN_STATE_DOWN);
-		}
-	}
-	else if (state == COIN_STATE_DOWN)
-	{
-		if (GetTickCount() - timing_start >= TIME_COIN_ON_AIR - 100)
-		{
-			isAppear = false;
-		}
-	}*/
-
 
 }
 
@@ -66,15 +51,4 @@ void CCoin::SetState(int state)
 	{
 		vx = vy = 0;
 	}
-	/*else if (state == COIN_STATE_UP)
-	{
-		vy = -0.2f;
-		StartTiming();
-		isAppear = true;
-	}
-	else
-	{
-		StartTiming();
-		vy = 0.2f;
-	}*/
 }

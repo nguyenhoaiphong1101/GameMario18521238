@@ -13,6 +13,7 @@
 #include "Drain.h"
 #include "Koopas.h"
 #include "Coin.h"
+#include "BrickQuestion.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -294,7 +295,20 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				marioCoin++;
 				
 			}
+			if (dynamic_cast<CBrickQuestion*>(e->obj))
+			{
+				if (e->ny > 0)
+				{
+					CBrickQuestion* brickQuestion = dynamic_cast<CBrickQuestion*>(e->obj);
+					if (brickQuestion->GetBefore())
+					{
+						brickQuestion->SetUp(true);
+						brickQuestion->SetBefore(false);
+						brickQuestion->SetAfter(true);
+					}
+				}
 
+			}
 		}
 	}
 	if (timeFly != 0 && GetTickCount() - timeFly > 3000)
