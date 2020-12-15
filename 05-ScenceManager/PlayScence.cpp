@@ -13,6 +13,8 @@
 #include "HUD.h"
 #include "Coin.h"
 #include "BrickQuestion.h"
+#include "FlowerAttack.h"
+#include "FireFlower.h"
 
 
 
@@ -48,6 +50,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_HUD	7
 #define OBJECT_TYPE_COIN	8
 #define OBJECT_TYPE_BRICK_QUESTION	9
+#define OBJECT_TYPE_FLOWER_RED	10
+#define OBJECT_TYPE_FLOWER_FIRE	11
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -183,6 +187,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_HUD: obj = new CHUD(); break; 
 	case OBJECT_TYPE_COIN: obj = new CCoin(COIN); break;
 	case OBJECT_TYPE_BRICK_QUESTION: obj = new CBrickQuestion(1); break;
+	case OBJECT_TYPE_FLOWER_RED:	  obj = new CFlowerAttack(100); break;
+	case OBJECT_TYPE_FLOWER_FIRE:	  obj = new CFireFlower(); break;
 	case OBJECT_TYPE_PORTAL:
 		{	
 			float r = atof(tokens[4].c_str());

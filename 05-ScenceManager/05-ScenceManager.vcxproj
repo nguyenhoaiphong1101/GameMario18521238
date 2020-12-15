@@ -133,6 +133,8 @@
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="Drain.cpp" />
     <ClCompile Include="Fire.cpp" />
+    <ClCompile Include="FireFlower.cpp" />
+    <ClCompile Include="FlowerAttack.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Koopas.cpp" />
     <ClCompile Include="NoCollision.cpp" />
@@ -157,6 +159,8 @@
     <ClInclude Include="Coin.h" />
     <ClInclude Include="Drain.h" />
     <ClInclude Include="Fire.h" />
+    <ClInclude Include="FireFlower.h" />
+    <ClInclude Include="FlowerAttack.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Koopas.h" />
     <ClInclude Include="NoCollision.h" />
