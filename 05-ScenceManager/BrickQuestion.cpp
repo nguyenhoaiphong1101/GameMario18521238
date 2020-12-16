@@ -3,6 +3,7 @@
 #include "Scence.h"
 #include "Coin.h"
 #include "MushRoom.h"
+#include "Leaf.h"
 #include <algorithm>
 CBrickQuestion::CBrickQuestion(int status)
 {
@@ -31,26 +32,26 @@ void CBrickQuestion::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	CalcPotentialCollisions(coObjects, coEvents);
 	// tạo animation gạch nhảy lên
-	if (!status_before)//nếu gạch k còn trạng thái đứng yên
+	if (status_after)//nếu gạch k còn trạng thái chấm hỏi
 	{
 		if (check)
 		{
-			if (timeAni > 3)
+			if (timeAni > BRICK_QUESTION_COUNT_TIME)
 			{
 				timeAni = 0;
 				check = false;
 			}
 			else
 			{
-				y -= 3;
+				y -= BRICK_QUESTION_COUNT_Y;
 				timeAni++;
 			}
 		}
 		else
 		{
-			if(timeAni<=3)
+			if(timeAni<= BRICK_QUESTION_COUNT_TIME)
 			{
-				y += 3;
+				y += BRICK_QUESTION_COUNT_Y;
 				timeAni++;
 			}
 				
@@ -113,23 +114,29 @@ void CBrickQuestion::SetState(int state)
 			coins->SetState(COIN_STATE_UP);
 			coins->x = x+ BRICK_QUESTION_BBOX_WIDTH/4;
 			coins->y = y - COIN_BBOX_HEIGHT;
-			LPANIMATION_SET ani_set = animation_sets->Get(7001);
+			LPANIMATION_SET ani_set = animation_sets->Get(BRICK_QUESTION_ANI_COIN);
 			coins->SetAnimationSet(ani_set);
 			((CPlayScene*)scene)->addObject(coins);
 			break;
 		}
 		case BRICK_QUESTION_STATUS_LEAF:
 		{
-			
+			CLeaf* leaf = new CLeaf();
+			leaf->x = x;
+			leaf->y = y - MUSHROOM_BBOX_HEIGHT * BRICK_QUESTION_LEAF;
+			LPANIMATION_SET ani_set = animation_sets->Get(BRICK_QUESTION_ANI_LEAF);
+			leaf->SetAnimationSet(ani_set);
+			((CPlayScene*)scene)->addObject(leaf);
 			break;
+			
 		}
 		case BRICK_QUESTION_STATUS_MUSHROOM:
 		{
 			CMushRoom* mushroom = new CMushRoom();
-			mushroom->x = x ;
-			mushroom->y = y - MUSHROOM_BBOX_HEIGHT *1.2;
+			mushroom->x = x;
+			mushroom->y = y - MUSHROOM_BBOX_HEIGHT * BRICK_QUESTION_MUSHROOM;
 			mushroom->vx = -MUSHROOM_SPEED;
-			LPANIMATION_SET ani_set = animation_sets->Get(6022);
+			LPANIMATION_SET ani_set = animation_sets->Get(BRICK_QUESTION_ANI_MUSHROOM);
 			mushroom->SetAnimationSet(ani_set);
 			((CPlayScene*)scene)->addObject(mushroom);
 			break;

@@ -20,7 +20,7 @@ CHUD::CHUD()
 
 	marioType = sprites->Get(HUD_MARIO_TYPE_SPRITE);
 
-	for (int i = 0; i < 7; i++)
+	for (int i = 0; i < SCORE_LENGTH; i++)
 	{
 		if (i != 6)
 		{
@@ -83,17 +83,17 @@ void CHUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 
 	//Chỉnh sửa phù hợp với HUD
-	while (stringLife.length() < 2)
+	while (stringLife.length() < LIFE_LENGTH)
 	{
 		stringLife = "0" + stringLife;
 	}
 	life = StringToSprite(stringLife);
-	while (stringTime.length() < 3)
+	while (stringTime.length() < COIN_LENGTH)
 	{
 		stringTime = "0" + stringTime;
 	}
 	time = StringToSprite(stringTime);
-	while (stringScore.length() < 7)	
+	while (stringScore.length() < SCORE_LENGTH)
 	{
 		stringScore = "0" + stringScore;
 	}
@@ -107,39 +107,39 @@ void CHUD::Render()
 
 	//draw a black background
 	backgroundBlack->Draw(x, y - 84);
-	hudBoard->Draw(x + 55, y - 81);
-	hudItem->Draw(x + 235, y - 81);
-	marioType->Draw(x + 59, y - 66);
-	world->Draw(x + 92, y - 74);	
+	hudBoard->Draw(x + HUDBOARD_X, y - HUDBOARD_Y);
+	hudItem->Draw(x + HUDITEM_X, y - HUDITEM_Y);
+	marioType->Draw(x + MARIOTYPE_X, y - HUD_CHAR_HEIGHT_LTS);
+	world->Draw(x + WORLD_X, y - HUD_CHAR_HEIGHT_CSS);
 
 	for (int i = 0; i < life.size(); i++)
 	{
-		life[i]->Draw(x + 84 + 8 * i, y - 66);
+		life[i]->Draw(x + HUD_CHAR_WIDTH_L + HUD_CHAR_WIDTH * i, y - HUD_CHAR_HEIGHT_LTS);
 	}
 
 	for (int i = 0; i < time.size(); i++)
 	{
-		time[i]->Draw(x + 179 + 8 * i, y - 66);
+		time[i]->Draw(x + HUD_CHAR_WIDTH_T + HUD_CHAR_WIDTH * i, y - HUD_CHAR_HEIGHT_LTS);
 	}
 
 	for (int i = 0; i < score.size(); i++)
 	{
-		score[i]->Draw(x + 107 + 8 * i, y - 66);
+		score[i]->Draw(x + HUD_CHAR_WIDTH_S + HUD_CHAR_WIDTH * i, y - HUD_CHAR_HEIGHT_LTS);
 	}
 
 	for (int i = 0; i < coin.size(); i++)
 	{
-		coin[i]->Draw(x + 187 + 8 * i, y - 74);
+		coin[i]->Draw(x + HUD_CHAR_WIDTH_C + HUD_CHAR_WIDTH * i, y - HUD_CHAR_HEIGHT_CSS);
 	}
 
 	for (int i = 0; i < storePowerNull.size(); i++)
 	{
-		storePowerNull[i]->Draw(x + 107 + 8 * i, y - 74);
+		storePowerNull[i]->Draw(x + HUD_CHAR_WIDTH_S + HUD_CHAR_WIDTH * i, y - HUD_CHAR_HEIGHT_CSS);
 	}
 
 	for (int i = 0; i < storePowerNullStack; i++)
 	{
-		storePower[i]->Draw(x + 107 + 8 * i, y - 74);
+		storePower[i]->Draw(x + HUD_CHAR_WIDTH_S + HUD_CHAR_WIDTH * i, y - HUD_CHAR_HEIGHT_CSS);
 	}
 
 }

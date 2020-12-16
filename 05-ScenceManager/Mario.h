@@ -8,6 +8,8 @@
 #define MARIO_WALKING_FLY	0.1f 
 #define MARIO_GEARING_MAX	0.051f
 
+#define TIME_FLY	3000
+
 
 
 #define MARIO_JUMP_SPEED_Y		0.5f

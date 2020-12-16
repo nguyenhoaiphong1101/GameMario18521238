@@ -314,15 +314,27 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						brickQuestion->SetUp(true);
 						brickQuestion->SetBefore(false);
 						brickQuestion->SetAfter(true);
+						if (brickQuestion->GetStatus() == BRICK_QUESTION_STATUS_SPECIAL)
+						{
+							if (level == MARIO_LEVEL_SMALL)
+							{
+								brickQuestion->SetStatus(BRICK_QUESTION_STATUS_MUSHROOM);
+							}
+							else if(level == MARIO_LEVEL_BIG)
+							{
+								brickQuestion->SetStatus(BRICK_QUESTION_STATUS_LEAF);
+							}
+						}
 						brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
-
+						marioCoin++;
+						marioScore += MARIO_SCORE;
 					}
 				}
 
 			}
 		}
 	}
-	if (timeFly != 0 && GetTickCount() - timeFly > 3000)
+	if (timeFly != 0 && GetTickCount() - timeFly > TIME_FLY)
 	{
 		flyCan = false;
 		landingCheck = true;

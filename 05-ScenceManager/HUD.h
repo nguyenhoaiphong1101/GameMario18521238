@@ -24,6 +24,35 @@
 #define HUD_8_SPRITE	90120
 #define HUD_9_SPRITE	90121
 #define HUD_BACKGROUND_SPRITE	90148
+#define HUD_CHAR_WIDTH	8
+#define HUD_CHAR_HEIGHT_LTS	66
+#define HUD_CHAR_HEIGHT_CSS	74
+
+#define HUD_CHAR_WIDTH_S	107
+#define HUD_CHAR_WIDTH_L	84
+#define HUD_CHAR_WIDTH_T	179
+#define HUD_CHAR_WIDTH_C	187
+
+#define HUDBOARD_X	55
+#define HUDBOARD_Y	81
+
+#define HUDITEM_X	235
+#define HUDITEM_Y	81
+
+#define MARIOTYPE_X	59
+#define WORLD_X	92
+
+
+#define LIFE_LENGTH	2
+#define COIN_LENGTH	3
+#define SCORE_LENGTH	7
+
+
+
+
+
+
+#define HUD_BACKGROUND_SPRITE	90148
 
 class CHUD : public CGameObject
 {

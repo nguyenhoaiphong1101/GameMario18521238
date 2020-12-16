@@ -52,7 +52,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_BRICK_QUESTION	9
 #define OBJECT_TYPE_FLOWER_RED	10
 #define OBJECT_TYPE_FLOWER_FIRE	11
-#define OBJECT_TYPE_BRICK_QUESTION_MUSHROOM	12
+#define OBJECT_TYPE_BRICK_QUESTION_SPECIAL	12
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -190,7 +190,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BRICK_QUESTION: obj = new CBrickQuestion(BRICK_QUESTION_STATUS_COIN); break;
 	case OBJECT_TYPE_FLOWER_RED:	  obj = new CFlowerAttack(100); break;
 	case OBJECT_TYPE_FLOWER_FIRE:	  obj = new CFireFlower(); break;
-	case OBJECT_TYPE_BRICK_QUESTION_MUSHROOM:	  obj = new CBrickQuestion(BRICK_QUESTION_STATUS_MUSHROOM); break;
+	case OBJECT_TYPE_BRICK_QUESTION_SPECIAL:	  obj = new CBrickQuestion(BRICK_QUESTION_STATUS_SPECIAL); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
