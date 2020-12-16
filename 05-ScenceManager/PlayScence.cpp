@@ -22,7 +22,7 @@
 
 using namespace std;
 
-CPlayScene::CPlayScene(int id, LPCWSTR filePath):
+CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 	CScene(id, filePath)
 {
 	key_handler = new CPlayScenceKeyHandler(this);
@@ -52,6 +52,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath):
 #define OBJECT_TYPE_BRICK_QUESTION	9
 #define OBJECT_TYPE_FLOWER_RED	10
 #define OBJECT_TYPE_FLOWER_FIRE	11
+#define OBJECT_TYPE_BRICK_QUESTION_MUSHROOM	12
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -92,7 +93,7 @@ void CPlayScene::_ParseSection_SPRITES(string line)
 	if (tex == NULL)
 	{
 		DebugOut(L"[ERROR] Texture ID %d not found!\n", texID);
-		return; 
+		return;
 	}
 
 	CSprites::GetInstance()->Add(ID, l, t, r, b, tex);
@@ -112,7 +113,7 @@ void CPlayScene::_ParseSection_ANIMATIONS(string line)
 	for (int i = 1; i < tokens.size(); i += 2)	// why i+=2 ?  sprite_id | frame_time  
 	{
 		int sprite_id = atoi(tokens[i].c_str());
-		int frame_time = atoi(tokens[i+1].c_str());
+		int frame_time = atoi(tokens[i + 1].c_str());
 		ani->Add(sprite_id, frame_time);
 	}
 
@@ -129,12 +130,12 @@ void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 
 	LPANIMATION_SET s = new CAnimationSet();
 
-	CAnimations *animations = CAnimations::GetInstance();
+	CAnimations* animations = CAnimations::GetInstance();
 
 	for (int i = 1; i < tokens.size(); i++)
 	{
 		int ani_id = atoi(tokens[i].c_str());
-		
+
 		LPANIMATION ani = animations->Get(ani_id);
 		s->push_back(ani);
 	}
@@ -143,7 +144,7 @@ void CPlayScene::_ParseSection_ANIMATION_SETS(string line)
 }
 
 /*
-	Parse a line in section [OBJECTS] 
+	Parse a line in section [OBJECTS]
 */
 void CPlayScene::_ParseSection_OBJECTS(string line)
 {
@@ -159,44 +160,45 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 
 	int ani_set_id = atoi(tokens[3].c_str());
 
-	CAnimationSets * animation_sets = CAnimationSets::GetInstance();
+	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 
-	CGameObject *obj = NULL;
+	CGameObject* obj = NULL;
 
-	CGameObject *objW = NULL;
+	CGameObject* objW = NULL;
 
 	switch (object_type)
 	{
 	case OBJECT_TYPE_MARIO:
-		if (player!=NULL) 
+		if (player != NULL)
 		{
 			DebugOut(L"[ERROR] MARIO object was created before!\n");
 			return;
 		}
-		obj = new CMario(x,y); 
-		player = (CMario*)obj;  
+		obj = new CMario(x, y);
+		player = (CMario*)obj;
 
 		DebugOut(L"[INFO] Player object created!\n");
 		break;
 	case OBJECT_TYPE_GOOMBA: obj = new CGoomba(); break;
 	case OBJECT_TYPE_BRICK: obj = new CBrick(); break;
 	case OBJECT_TYPE_KOOPAS: obj = new CKoopas(); break;
-	case OBJECT_TYPE_NOCOLLISION: obj = new CNoCollision() ; break;
-	case OBJECT_TYPE_BOX: obj = new CBox() ; break;
-	case OBJECT_TYPE_DRAIN: obj = new CDrain() ; break;
-	case OBJECT_TYPE_HUD: obj = new CHUD(); break; 
+	case OBJECT_TYPE_NOCOLLISION: obj = new CNoCollision(); break;
+	case OBJECT_TYPE_BOX: obj = new CBox(); break;
+	case OBJECT_TYPE_DRAIN: obj = new CDrain(); break;
+	case OBJECT_TYPE_HUD: obj = new CHUD(); break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(COIN); break;
-	case OBJECT_TYPE_BRICK_QUESTION: obj = new CBrickQuestion(1); break;
+	case OBJECT_TYPE_BRICK_QUESTION: obj = new CBrickQuestion(BRICK_QUESTION_STATUS_COIN); break;
 	case OBJECT_TYPE_FLOWER_RED:	  obj = new CFlowerAttack(100); break;
 	case OBJECT_TYPE_FLOWER_FIRE:	  obj = new CFireFlower(); break;
+	case OBJECT_TYPE_BRICK_QUESTION_MUSHROOM:	  obj = new CBrickQuestion(BRICK_QUESTION_STATUS_MUSHROOM); break;
 	case OBJECT_TYPE_PORTAL:
-		{	
-			float r = atof(tokens[4].c_str());
-			float b = atof(tokens[5].c_str());
-			int scene_id = atoi(tokens[6].c_str());
-			obj = new CPortal(x, y, r, b, scene_id);
-		}
-		break;
+	{
+		float r = atof(tokens[4].c_str());
+		float b = atof(tokens[5].c_str());
+		int scene_id = atoi(tokens[6].c_str());
+		obj = new CPortal(x, y, r, b, scene_id);
+	}
+	break;
 	default:
 		DebugOut(L"[ERR] Invalid object type: %d\n", object_type);
 		return;
@@ -208,7 +210,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
 
 	obj->SetAnimationSet(ani_set);
-	
+
 	objects.push_back(obj);
 }
 
@@ -220,7 +222,7 @@ void CPlayScene::Load()
 	f.open(sceneFilePath);
 
 	// current resource section flag
-	int section = SCENE_SECTION_UNKNOWN;					
+	int section = SCENE_SECTION_UNKNOWN;
 
 	char str[MAX_SCENE_LINE];
 	while (f.getline(str, MAX_SCENE_LINE))
@@ -230,26 +232,30 @@ void CPlayScene::Load()
 		if (line[0] == '#') continue;	// skip comment lines	
 
 		if (line == "[TEXTURES]") { section = SCENE_SECTION_TEXTURES; continue; }
-		if (line == "[SPRITES]") { 
-			section = SCENE_SECTION_SPRITES; continue; }
-		if (line == "[ANIMATIONS]") { 
-			section = SCENE_SECTION_ANIMATIONS; continue; }
-		if (line == "[ANIMATION_SETS]") { 
-			section = SCENE_SECTION_ANIMATION_SETS; continue; }
-		if (line == "[OBJECTS]") { 
-			section = SCENE_SECTION_OBJECTS; continue; }
-		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }	
+		if (line == "[SPRITES]") {
+			section = SCENE_SECTION_SPRITES; continue;
+		}
+		if (line == "[ANIMATIONS]") {
+			section = SCENE_SECTION_ANIMATIONS; continue;
+		}
+		if (line == "[ANIMATION_SETS]") {
+			section = SCENE_SECTION_ANIMATION_SETS; continue;
+		}
+		if (line == "[OBJECTS]") {
+			section = SCENE_SECTION_OBJECTS; continue;
+		}
+		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }
 
 		//
 		// data section
 		//
 		switch (section)
-		{ 
-			case SCENE_SECTION_TEXTURES: _ParseSection_TEXTURES(line); break;
-			case SCENE_SECTION_SPRITES: _ParseSection_SPRITES(line); break;
-			case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
-			case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
-			case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
+		{
+		case SCENE_SECTION_TEXTURES: _ParseSection_TEXTURES(line); break;
+		case SCENE_SECTION_SPRITES: _ParseSection_SPRITES(line); break;
+		case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
+		case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
+		case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
 		}
 	}
 
@@ -275,22 +281,23 @@ void CPlayScene::Update(DWORD dt)
 			obj->SetPosition(player->x + MARIO_FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
 			obj->vx = FIRE_SPEED;
 			obj->nx = 1;
-			
+
 		}
 		else
 		{
 			obj->SetPosition(player->x - FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
 			obj->vx = -FIRE_SPEED;
 			obj->nx = -1;
-			
+
 		}
 
 		LPANIMATION_SET ani_set = animation_sets->Get(OBJECT_ANI_SET_FIRE);
 		obj->SetAnimationSet(ani_set);
 		objects.push_back(obj);
 	}
-	
-	
+
+
+
 
 
 	vector<LPGAMEOBJECT> coObjects;
@@ -301,25 +308,34 @@ void CPlayScene::Update(DWORD dt)
 
 	for (size_t i = 0; i < objects.size(); i++)
 	{
+
+		LPGAMEOBJECT obj = objects[i];
+		if (obj->isDisAppear)
+		{
+			objects.erase(objects.begin() + i);
+			delete obj;
+			
+		}else
+
 		objects[i]->Update(dt, &coObjects);
 	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
-	if (player == NULL) return; 
+	if (player == NULL) return;
 
 	if (player->x < 0) player->x = 0; //Chống lùi qa trái
 
 	// Update camera to follow mario
-	
+
 }
 
 void CPlayScene::Render()
 {
 	for (int i = 0; i < objects.size(); i++)
 	{
-			objects[i]->Render();
+		objects[i]->Render();
 	}
-		
+
 }
 
 /*
@@ -342,13 +358,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	CGame* game = CGame::GetInstance();
 
 
-	CMario *mario = ((CPlayScene*)scence)->GetPlayer();
+	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	switch (KeyCode)
 	{
 	case DIK_SPACE:
 		if (mario->checkjumping == 0)
 		{
-			if (mario->GetSpeed()==7 && mario->GetLevel()==MARIO_LEVEL_FOX)
+			if (mario->GetSpeed() == 7 && mario->GetLevel() == MARIO_LEVEL_FOX)
 			{
 				mario->flyCan = true;
 				mario->SetState(MARIO_STATE_FLY);
@@ -362,18 +378,18 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 			{
 				mario->SetState(MARIO_STATE_JUMP);
 			}
-			
+
 		}
 		break;
-	case DIK_A: 
+	case DIK_A:
 		mario->Reset();
 		break;
-	case DIK_R: 
-		mario->attack=true;
+	case DIK_R:
+		mario->attack = true;
 		break;
-	case DIK_H: 
-		if(mario->GetLevel() == MARIO_LEVEL_FOX)
-		mario->landingCheck=true;
+	case DIK_H:
+		if (mario->GetLevel() == MARIO_LEVEL_FOX)
+			mario->landingCheck = true;
 		break;
 	case DIK_S:
 		mario->holdKoopas = true;
@@ -382,13 +398,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 		mario->SetLevel(MARIO_LEVEL_FIRE);
 		break;
 	case DIK_DOWN:
-		mario->sit=true;
+		mario->sit = true;
 		break;
 	case DIK_O:
 		mario->SetLevel(MARIO_LEVEL_FOX);
 		break;
 	case DIK_Z:
-		
+
 		break;
 	case DIK_L:
 		if (mario->GetLevel() == MARIO_LEVEL_FIRE)
@@ -424,36 +440,36 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 		break;
 	case DIK_DOWN:
 		mario->sit = false;
-		if(mario->GetLevel()!= MARIO_LEVEL_SMALL)
-		mario->y -= MARIO_SIT_BBOX_HEIGHT;
+		if (mario->GetLevel() != MARIO_LEVEL_SMALL)
+			mario->y -= MARIO_SIT_BBOX_HEIGHT;
 		break;
 	case DIK_H:
 		mario->landingCheck = false;
 		break;
-	
+
 	case DIK_Z:
-			mario->stopRun = GetTickCount();
-			mario->startRun = 0;
+		mario->stopRun = GetTickCount();
+		mario->startRun = 0;
 	case DIK_RIGHT:
-			mario->stopRun = GetTickCount();
-			mario->startRun = 0;
+		mario->stopRun = GetTickCount();
+		mario->startRun = 0;
 	case DIK_LEFT:
-			mario->stopRun = GetTickCount();
-			mario->startRun = 0;
-			
+		mario->stopRun = GetTickCount();
+		mario->startRun = 0;
+
 	default:
 		break;
 	}
 }
 
-void CPlayScenceKeyHandler::KeyState(BYTE *states)
+void CPlayScenceKeyHandler::KeyState(BYTE* states)
 {
-	CGame *game = CGame::GetInstance();
-	CMario *mario = ((CPlayScene*)scence)->GetPlayer();
+	CGame* game = CGame::GetInstance();
+	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
-	
+
 
 	if (game->IsKeyDown(DIK_RIGHT))
 	{
@@ -467,11 +483,11 @@ void CPlayScenceKeyHandler::KeyState(BYTE *states)
 					mario->startRun = GetTickCount();
 					mario->stopRun = 0;
 				}
-				
+
 			}
 		}
 		else
-		mario->SetState(MARIO_STATE_WALKING_RIGHT);
+			mario->SetState(MARIO_STATE_WALKING_RIGHT);
 	}
 	else if (game->IsKeyDown(DIK_LEFT))
 	{

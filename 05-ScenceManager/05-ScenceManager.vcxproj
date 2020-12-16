@@ -137,6 +137,7 @@
     <ClCompile Include="FlowerAttack.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="Koopas.cpp" />
+    <ClCompile Include="MushRoom.cpp" />
     <ClCompile Include="NoCollision.cpp" />
     <ClCompile Include="Portal.cpp" />
     <ClCompile Include="Utils.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="FlowerAttack.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="Koopas.h" />
+    <ClInclude Include="MushRoom.h" />
     <ClInclude Include="NoCollision.h" />
     <ClInclude Include="Portal.h" />
     <ClInclude Include="Utils.h" />

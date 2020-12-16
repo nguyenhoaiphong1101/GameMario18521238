@@ -1,5 +1,8 @@
 #pragma once
 #include "GameObject.h"
+#include "Mario.h"
+#include "Game.h"
+#include "PlayScence.h"
 #define BRICK_QUESTION_BBOX_WIDTH	16
 #define BRICK_QUESTION_BBOX_HEIGHT	16
 
@@ -9,7 +12,10 @@
 #define BRICK_QUESTION_STATE_AFTER	123
 #define BRICK_QUESTION_ANI_AFTER	1
 
-#define BRICK_QUESTION_STATUS_DEFAULT		1
+
+#define BRICK_QUESTION_STATUS_COIN		1
+#define BRICK_QUESTION_STATUS_LEAF		3
+#define BRICK_QUESTION_STATUS_MUSHROOM		2
 
 
 
@@ -26,7 +32,7 @@ public:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	CBrickQuestion(int status);
-	virtual void SetState(int state, vector<LPGAMEOBJECT>* coObjects);
+	virtual void SetState(int state);
 	int GetStatus()
 	{
 		return status;

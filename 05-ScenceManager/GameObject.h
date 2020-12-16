@@ -60,6 +60,7 @@ public:
 	int show = 1;
 	int state;
 
+	bool isDisAppear = false;
 	DWORD dt; 
 
 	LPANIMATION_SET animation_set;

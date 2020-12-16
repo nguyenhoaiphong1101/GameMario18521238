@@ -6,6 +6,7 @@
 #include "Game.h"
 
 #include "Goomba.h"
+#include "MushRoom.h"
 #include "Box.h"
 #include "Portal.h"
 #include "Fire.h"
@@ -17,7 +18,7 @@
 
 CMario::CMario(float x, float y) : CGameObject()
 {
-	level = MARIO_LEVEL_BIG;
+	level = MARIO_LEVEL_SMALL;
 	untouchable = 0;
 	SetState(MARIO_STATE_IDLE);
 	start_x = x;
@@ -55,8 +56,11 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 			nx = 0;
 			ny = 0;
 		}
-		
-		
+		if (dynamic_cast<CMushRoom*>(c->obj))
+		{
+			nx = 0;
+			ny = 0;
+		}
 	}
 
 	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
@@ -287,13 +291,18 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CPortal* p = dynamic_cast<CPortal*>(e->obj);
 				CGame::GetInstance()->SwitchScene(p->GetSceneId());
 			}
-			if (dynamic_cast<CCoin*>(e->obj)) // if e->obj is Coin
+			if (dynamic_cast<CCoin*>(e->obj)) 
 			{
-				
 				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
 				coin->SetShow(false);
 				marioCoin++;
-				
+			}
+			if (dynamic_cast<CMushRoom*>(e->obj)) 
+			{
+				if (level == MARIO_LEVEL_SMALL)
+					level = MARIO_LEVEL_BIG;
+				y -= MARIO_BIG_BBOX_HEIGHT;
+				e->obj->isDisAppear = true;
 			}
 			if (dynamic_cast<CBrickQuestion*>(e->obj))
 			{
@@ -305,6 +314,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						brickQuestion->SetUp(true);
 						brickQuestion->SetBefore(false);
 						brickQuestion->SetAfter(true);
+						brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
+
 					}
 				}
 
