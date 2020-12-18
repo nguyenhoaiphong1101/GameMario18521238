@@ -107,7 +107,9 @@ void CFlowerAttack::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		else
 		{
 			if (isTime == 0)
+			{
 				Appear();
+			}
 			if (GetTickCount() - isTime <= 3000)
 			{
 				vy = 0.02f;
@@ -128,11 +130,14 @@ void CFlowerAttack::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (Up)
 		{
 			if (isTime == 0)
+			{
 				Appear();
+				isTimeAgain = GetTickCount();
+			}
 			if (GetTickCount() - isTime <= 2000)
 			{
 				vy = -0.02f;
-				if (y <= 96)
+				if (y <= 78)
 				{
 					vy = 0;
 					shooting = true;
@@ -143,6 +148,7 @@ void CFlowerAttack::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				isTime = 0;
 				Up = false;
+				isTimeAgain = 0;
 				shooting = false;
 				shooted = false;
 			}
@@ -154,33 +160,68 @@ void CFlowerAttack::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (GetTickCount() - isTime <= 2000)
 			{
 				vy = 0.02f;
-				if (this->y >= 126)
+				if (this->y >= 102)
 				{
 					vy = 0;
 				}
 			}
 			else
 			{
+				isTimeAgain = 1;
+				Up = true;
+				isTime = 0;
+			}
+		}
+		break;
+	case FLOWER_NORMAL:
+		if (Up)
+		{
+			if (isTime == 0)
+			{
+				Appear();
+				isTimeAgain = GetTickCount();
+			}
+			if (GetTickCount() - isTime <= 2000)
+			{
+				vy = -0.02f;
+				if (y <= 95)
+				{
+					vy = 0;
+				}
+			}
+			else
+			{
+				isTimeAgain = 0;
+				isTime = 0;
+				Up = false;
+			}
+		}
+		else
+		{
+			if (isTime == 0)
+				Appear();
+			if (GetTickCount() - isTime <= 2000)
+			{
+				vy = 0.02f;
+				if (this->y >= 118)
+				{
+					vy = 0;
+				}
+			}
+			else
+			{
+				isTimeAgain = 1;
 				Up = true;
 				isTime = 0;
 			}
 		}
 		break;
 	}
-	CalcPotentialCollisions(coObjects, coEvents);
-
 	if (coEvents.size() == 0)
 	{
 		y += dy;
 	}
-	else
-	{
-		float min_tx, min_ty, nx = 0, ny;
-		float rdx = 0;
-		float rdy = 0;
-		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-		// clean up collision events
-	}
+	
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
 	
@@ -247,9 +288,64 @@ void CFlowerAttack::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 			}
 			break;
+		case FLOWER_GREEN:
+			if (mario->x <= x)
+			{
+				if (mario->y >= y)
+				{
+					if (vy == 0)
+					{
+						ani = FLOWER_GREEN_ANI_LEFT_DOWN;
+					}
+					else
+					{
+						ani = FLOWER_GREEN_ANI_LEFT_UP;
+					}
 
+				}
+				else
+				{
+					if (vy == 0)
+					{
+						ani = FLOWER_GREEN_ANI_LEFT_UP;
+					}
+					else
+					{
+						ani = FLOWER_GREEN_ANI_LEFT_UP;
+					}
+				}
+
+			}
+			else
+			{
+				if (mario->y >= y)
+				{
+					if (vy == 0)
+					{
+						ani = FLOWER_GREEN_ANI_RIGHT_DOWN;
+					}
+					else
+					{
+						ani = FLOWER_GREEN_ANI_LEFT_UP;
+					}
+
+				}
+				else
+				{
+					if (vy == 0)
+					{
+						ani = FLOWER_GREEN_ANI_RIGHT_UP;
+					}
+					else
+					{
+						ani = FLOWER_GREEN_ANI_RIGHT_UP;
+					}
+				}
+			}
+			break;
+		case FLOWER_NORMAL:
+			ani= FLOWER_GREEN_ANI_UP;
 		}
-
 		animation_set->at(ani)->Render(x, y);
 	}
 
@@ -267,7 +363,7 @@ void CFlowerAttack::Attack(vector<LPGAMEOBJECT>* coObjects)
 		{
 			CFireFlower* fire = dynamic_cast<CFireFlower*>(obj);
 			if (fire->GetAppear()) continue;
-			if (shooting && status != FLOWER_GREEN)
+			if (shooting /*&& status != FLOWER_GREEN*/)
 			{
 				shooting = false;
 				shooted = true;

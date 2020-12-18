@@ -1,7 +1,7 @@
 #pragma once
 #include "GameObject.h"
 
-#define DRAIN_BBOX_WIDTH  16
+#define DRAIN_BBOX_WIDTH  3
 #define DRAIN_BBOX_HEIGHT 16
 
 class CDrain : public CGameObject

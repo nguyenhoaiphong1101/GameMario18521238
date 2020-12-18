@@ -14,6 +14,8 @@
 #include "Coin.h"
 #include "BrickQuestion.h"
 #include "FlowerAttack.h"
+#include "GoombaPara.h"
+#include "KoopaPara.h"
 #include "FireFlower.h"
 
 
@@ -53,6 +55,10 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_FLOWER_RED	10
 #define OBJECT_TYPE_FLOWER_FIRE	11
 #define OBJECT_TYPE_BRICK_QUESTION_SPECIAL	12
+#define OBJECT_TYPE_GOOMBAPARA	13
+#define OBJECT_TYPE_KOOPAPARA	14
+#define OBJECT_TYPE_FLOWER_GREEN	15
+#define OBJECT_TYPE_FLOWER_NORMAL	16
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -188,9 +194,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_HUD: obj = new CHUD(); break;
 	case OBJECT_TYPE_COIN: obj = new CCoin(COIN); break;
 	case OBJECT_TYPE_BRICK_QUESTION: obj = new CBrickQuestion(BRICK_QUESTION_STATUS_COIN); break;
-	case OBJECT_TYPE_FLOWER_RED:	  obj = new CFlowerAttack(100); break;
+	case OBJECT_TYPE_FLOWER_RED:	  obj = new CFlowerAttack(FLOWER_RED); break;
 	case OBJECT_TYPE_FLOWER_FIRE:	  obj = new CFireFlower(); break;
 	case OBJECT_TYPE_BRICK_QUESTION_SPECIAL:	  obj = new CBrickQuestion(BRICK_QUESTION_STATUS_SPECIAL); break;
+	case OBJECT_TYPE_GOOMBAPARA:	  obj = new CGoombaPara(); break;
+	case OBJECT_TYPE_KOOPAPARA:	  obj = new CKoopaPara(); break;
+	case OBJECT_TYPE_FLOWER_GREEN:	  obj = new CFlowerAttack(FLOWER_GREEN); break;
+	case OBJECT_TYPE_FLOWER_NORMAL:	  obj = new CFlowerAttack(FLOWER_NORMAL); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
@@ -298,7 +308,7 @@ void CPlayScene::Update(DWORD dt)
 
 
 
-
+	CGame* game = CGame::GetInstance();
 
 	vector<LPGAMEOBJECT> coObjects;
 	for (size_t i = 0; i < objects.size(); i++)
@@ -316,7 +326,7 @@ void CPlayScene::Update(DWORD dt)
 			delete obj;
 			
 		}else
-
+		if(obj->x<=player->x+game->GetScreenWidth())
 		objects[i]->Update(dt, &coObjects);
 	}
 
@@ -359,60 +369,69 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 
 
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
-	switch (KeyCode)
+	if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
 	{
-	case DIK_SPACE:
-		if (mario->checkjumping == 0)
+		switch (KeyCode)
 		{
-			if (mario->GetSpeed() == 7 && mario->GetLevel() == MARIO_LEVEL_FOX)
+		case DIK_S:
+			if (mario->checkjumping == 0)
 			{
-				mario->flyCan = true;
-				mario->SetState(MARIO_STATE_FLY);
-				mario->timeFly = GetTickCount();
-			}
-			else if (game->IsKeyDown(DIK_LSHIFT))
-			{
-				mario->SetState(MARIO_STATE_JUMP_HIGH);
-			}
-			else
-			{
-				mario->SetState(MARIO_STATE_JUMP);
-			}
+				if (mario->GetSpeed() == 7 && mario->GetLevel() == MARIO_LEVEL_FOX)
+				{
+					mario->flyCan = true;
+					mario->SetState(MARIO_STATE_FLY);
+					mario->timeFly = GetTickCount();
+				}
+				else if (game->IsKeyDown(DIK_LSHIFT))
+				{
+					mario->SetState(MARIO_STATE_JUMP_HIGH);
+				}
+				else
+				{
+					mario->SetState(MARIO_STATE_JUMP);
+				}
 
-		}
-		break;
-	case DIK_A:
-		mario->Reset();
-		break;
-	case DIK_R:
-		mario->attack = true;
-		break;
-	case DIK_H:
-		if (mario->GetLevel() == MARIO_LEVEL_FOX)
-			mario->landingCheck = true;
-		break;
-	case DIK_S:
-		mario->holdKoopas = true;
-		break;
-	case DIK_I:
-		mario->SetLevel(MARIO_LEVEL_FIRE);
-		break;
-	case DIK_DOWN:
-		mario->sit = true;
-		break;
-	case DIK_O:
-		mario->SetLevel(MARIO_LEVEL_FOX);
-		break;
-	case DIK_Z:
+			}
+			
+			break;
+		case DIK_R:
+			mario->Reset();
+			break;
+		case DIK_A:
+			if (mario->GetLevel() == MARIO_LEVEL_FIRE)
+			{
+				if(mario->vx==0)
+				mario->SetState(MARIO_STATE_SHOOT_FIRE);
+			}
+			if (mario->GetLevel() == MARIO_LEVEL_FOX)
+			{
+				mario->attackCheck = GetTickCount();
+				mario->attack = true;
 
-		break;
-	case DIK_L:
-		if (mario->GetLevel() == MARIO_LEVEL_FIRE)
-		{
-			mario->SetState(MARIO_STATE_SHOOT_FIRE);
+			}
+			mario->holdKoopas = true;
+			break;
+		case DIK_SPACE:
+			if (mario->GetLevel() == MARIO_LEVEL_FOX)
+			{
+					mario->landingCheck = true;
+			}
+			break;
+
+		case DIK_I:
+			mario->y -= MARIO_BIG_BBOX_HEIGHT;
+			mario->SetLevel(MARIO_LEVEL_FIRE);
+			break;
+		case DIK_DOWN:
+			mario->sit = true;
+			break;
+		case DIK_O:
+			mario->y -= MARIO_BIG_BBOX_HEIGHT;
+			mario->SetLevel(MARIO_LEVEL_FOX);
+			break;
 		}
-		break;
 	}
+	
 }
 
 void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
@@ -421,45 +440,45 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 
 
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
-	switch (KeyCode)
+	if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
 	{
-	case DIK_R:
-		mario->attack = false;
-		break;
-	case DIK_S:
-		mario->holdKoopas = false;
-		break;
-	case DIK_SPACE:
-		if (mario->flyCan == true)
+		switch (KeyCode)
 		{
-			mario->SetState(MARIO_STATE_LANDING);
-			mario->landingCheck = true;
+		
+		case DIK_A:
+			mario->holdKoopas = false;
+			mario->attack = false;
+			mario->stopRun = GetTickCount();
+			mario->startRun = 0;
+			break;
+		case DIK_S:
+			if (mario->flyCan == true)
+			{
+				mario->SetState(MARIO_STATE_LANDING);
+				mario->landingCheck = true;
+			}
+			mario->flyCan = false;
+			mario->timeFly = 0;
+			mario->landingCheck = false;
+			mario->holdKoopasCol = false;
+			break;
+		case DIK_DOWN:
+			mario->sit = false;
+			if (mario->GetLevel() != MARIO_LEVEL_SMALL)
+				mario->y -= MARIO_SIT_BBOX_HEIGHT;
+			break;
+		case DIK_RIGHT:
+			mario->stopRun = GetTickCount();
+			mario->startRun = 0;
+		case DIK_LEFT:
+			mario->stopRun = GetTickCount();
+			mario->startRun = 0;
+
+		default:
+			break;
 		}
-		mario->flyCan = false;
-		mario->timeFly = 0;
-		break;
-	case DIK_DOWN:
-		mario->sit = false;
-		if (mario->GetLevel() != MARIO_LEVEL_SMALL)
-			mario->y -= MARIO_SIT_BBOX_HEIGHT;
-		break;
-	case DIK_H:
-		mario->landingCheck = false;
-		break;
-
-	case DIK_Z:
-		mario->stopRun = GetTickCount();
-		mario->startRun = 0;
-	case DIK_RIGHT:
-		mario->stopRun = GetTickCount();
-		mario->startRun = 0;
-	case DIK_LEFT:
-		mario->stopRun = GetTickCount();
-		mario->startRun = 0;
-
-	default:
-		break;
 	}
+	
 }
 
 void CPlayScenceKeyHandler::KeyState(BYTE* states)
@@ -470,47 +489,50 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	// disable control key when Mario die 
 	if (mario->GetState() == MARIO_STATE_DIE) return;
 
-
-	if (game->IsKeyDown(DIK_RIGHT))
+	if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
 	{
-		if (game->IsKeyDown(DIK_Z))
+		if (game->IsKeyDown(DIK_RIGHT))
 		{
-			mario->SetState(MARIO_STATE_WALKING_RIGHT_FAST);
-			if (mario->vx != 0)
+			if (game->IsKeyDown(DIK_A))
 			{
-				if (mario->startRun == 0)
+				mario->SetState(MARIO_STATE_WALKING_RIGHT_FAST);
+				if (mario->vx != 0)
 				{
-					mario->startRun = GetTickCount();
-					mario->stopRun = 0;
-				}
+					if (mario->startRun == 0)
+					{
+						mario->startRun = GetTickCount();
+						mario->stopRun = 0;
+					}
 
-			}
-		}
-		else
-			mario->SetState(MARIO_STATE_WALKING_RIGHT);
-	}
-	else if (game->IsKeyDown(DIK_LEFT))
-	{
-		if (game->IsKeyDown(DIK_Z))
-		{
-			mario->SetState(MARIO_STATE_WALKING_LEFT_FAST);
-			if (mario->vx != 0)
-			{
-				if (mario->startRun == 0)
-				{
-					mario->startRun = GetTickCount();
-					mario->stopRun = 0;
 				}
 			}
+			else
+				mario->SetState(MARIO_STATE_WALKING_RIGHT);
 		}
+		else if (game->IsKeyDown(DIK_LEFT))
+		{
+			if (game->IsKeyDown(DIK_A))
+			{
+				mario->SetState(MARIO_STATE_WALKING_LEFT_FAST);
+				if (mario->vx != 0)
+				{
+					if (mario->startRun == 0)
+					{
+						mario->startRun = GetTickCount();
+						mario->stopRun = 0;
+					}
+				}
+			}
+			else
+				mario->SetState(MARIO_STATE_WALKING_LEFT);
+		}
+		/*else if (game->IsKeyDown(DIK_R))
+		{
+			if (mario->GetLevel() == MARIO_LEVEL_FOX)
+				mario->SetState(MARIO_STATE_ATTACK);
+		}*/
 		else
-			mario->SetState(MARIO_STATE_WALKING_LEFT);
+			mario->SetState(MARIO_STATE_IDLE);
 	}
-	/*else if (game->IsKeyDown(DIK_R))
-	{
-		if (mario->GetLevel() == MARIO_LEVEL_FOX)
-			mario->SetState(MARIO_STATE_ATTACK);
-	}*/
-	else
-		mario->SetState(MARIO_STATE_IDLE);
+	
 }

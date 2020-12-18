@@ -135,7 +135,9 @@
     <ClCompile Include="Fire.cpp" />
     <ClCompile Include="FireFlower.cpp" />
     <ClCompile Include="FlowerAttack.cpp" />
+    <ClCompile Include="GoombaPara.cpp" />
     <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="KoopaPara.cpp" />
     <ClCompile Include="Koopas.cpp" />
     <ClCompile Include="Leaf.cpp" />
     <ClCompile Include="MushRoom.cpp" />
@@ -163,7 +165,9 @@
     <ClInclude Include="Fire.h" />
     <ClInclude Include="FireFlower.h" />
     <ClInclude Include="FlowerAttack.h" />
+    <ClInclude Include="GoombaPara.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="KoopaPara.h" />
     <ClInclude Include="Koopas.h" />
     <ClInclude Include="Leaf.h" />
     <ClInclude Include="MushRoom.h" />

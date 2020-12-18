@@ -14,12 +14,14 @@
 
 #define GOOMBA_ANI_WALKING 0
 #define GOOMBA_ANI_DIE 1
+#define GOOMBA_START_X 5
 
 
 class CGoomba : public CGameObject
 {
 	
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
+	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);
 	virtual void Render();
 

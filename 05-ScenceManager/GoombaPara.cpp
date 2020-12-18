@@ -1,15 +1,16 @@
-#include "Goomba.h"
-#include <algorithm>
 #include "GoombaPara.h"
 #include "Brick.h"
-#include "Box.h"
-#include "Koopas.h"
-CGoomba::CGoomba()
+#include "Goomba.h"
+#include <algorithm>
+#include "Mario.h"
+CGoombaPara::CGoombaPara()
 {
 	SetState(GOOMBA_STATE_WALKING);
+	level = GOOMBA_LEVEL_JUMP;
+	checkJump = GetTickCount();
 
 }
-void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
+void CGoombaPara::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
 {
 
 	for (UINT i = 0; i < coObjects->size(); i++)
@@ -19,16 +20,6 @@ void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 		{
 			continue;
 		}
-		if (dynamic_cast<CGoombaPara*>(coObjects->at(i)))
-		{
-			continue;
-		}
-		if (dynamic_cast<CKoopas*>(coObjects->at(i)))
-		{
-			continue;
-		}
-		
-		
 
 		if (e->t > 0 && e->t <= 1.0f)
 			coEvents.push_back(e);
@@ -40,24 +31,41 @@ void CGoomba::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 
 }
 
-void CGoomba::GetBoundingBox(float &left, float &top, float &right, float &bottom)
+void CGoombaPara::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
-	left = x;
-	top = y;
-	right = x + GOOMBA_BBOX_WIDTH;
-
-	if (state == GOOMBA_STATE_DIE)
-		bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
-	else 	
+	
+	if (level == GOOMBA_LEVEL_JUMP)
+	{
+		left = x;
+		top = y;
+		right = x + GOOMBA_JUMP_BBOX_WIDTH;
+		bottom = y + GOOMBA_JUMP_BBOX_HEIGHT;
+	}
+	if (level == GOOMBA_LEVEL_WALKING)
+	{
+		left = x;
+		top = y;
+		right = x + GOOMBA_BBOX_WIDTH;
 		bottom = y + GOOMBA_BBOX_HEIGHT;
+	}
 	if (state == GOOMBA_STATE_DIE)
 	{
 		right = left = bottom = top = 0;
 	}
+	/*if (state == GOOMBA_STATE_DIE)
+		bottom = y + GOOMBA_BBOX_HEIGHT_DIE;
+	else
+		bottom = y + GOOMBA_BBOX_HEIGHT;*/
 }
 
-void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
+void CGoombaPara::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+
+	if (GetTickCount() - checkJump >= GOOMBA_JUMP && level == GOOMBA_LEVEL_JUMP)
+	{
+		vy = -GOOMBA_JUMP_SPEED;
+		checkJump = GetTickCount();
+	}
 
 	//
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
@@ -71,7 +79,7 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	coEvents.clear();
 
 	// turn off collision when die 
-	if (state != GOOMBA_STATE_DIE_DOWN &&  state != GOOMBA_STATE_DIE)
+	if (state != GOOMBA_STATE_DIE_DOWN && state != GOOMBA_STATE_DIE)
 		CalcPotentialCollisions(coObjects, coEvents);
 
 
@@ -112,31 +120,37 @@ void CGoomba::Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects)
 	}
 }
 
-void CGoomba::Render()
+void CGoombaPara::Render()
 {
-	
-	int ani = GOOMBA_ANI_WALKING;
+	int ani = -1;
+	if (level == GOOMBA_LEVEL_JUMP)
+	{
+		ani = GOOMBA_ANI_JUMP;
+	}
+	else 
+	{
+		ani = GOOMBAPARA_ANI_WALKING;
+	}
 	if (state == GOOMBA_STATE_DIE) {
-		ani = GOOMBA_ANI_DIE;
+		ani = GOOMBAPARA_ANI_DIE;
 	}
 
-	animation_set->at(ani)->Render(x,y);
+	animation_set->at(ani)->Render(x, y);
 
 	//RenderBoundingBox();
 }
 
-void CGoomba::SetState(int state)
+void CGoombaPara::SetState(int state)
 {
 	CGameObject::SetState(state);
 	switch (state)
 	{
-		case GOOMBA_STATE_DIE:
-			vx = 0;
-			vy = -0.5f;
-			break;
-		case GOOMBA_STATE_WALKING: 
-			vx = -GOOMBA_WALKING_SPEED;
-			break;
-		
+	case GOOMBA_STATE_DIE:
+		vx = 0;
+		vy = -0.5f;
+		break;
+	case GOOMBA_STATE_WALKING:
+		vx = -GOOMBA_WALKING_SPEED;
+		break;
 	}
 }

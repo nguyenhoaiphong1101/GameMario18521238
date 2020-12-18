@@ -1,20 +1,20 @@
-#include "Koopas.h"
+#include "KoopaPara.h"
 #include "Box.h"
 #include "Drain.h"
 #include "Brick.h"
 #include "Mario.h"
+#include "Koopas.h"
 #include "PlayScence.h"
 #include "Game.h"
-#include "GoombaPara.h"
 #include <algorithm>
-#include "FireFlower.h"
 
-CKoopas::CKoopas()
+CKoopaPara::CKoopaPara()
 {
-	SetState(KOOPAS_STATE_WALKING);
+	SetState(KOOPAS_STATE_JUMP);
+	checkJump = GetTickCount();
 }
 
-void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
+void CKoopaPara::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
 {
 
 	for (UINT i = 0; i < coObjects->size(); i++)
@@ -24,21 +24,14 @@ void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 		{
 			continue;
 		}
-		if (dynamic_cast<CGoombaPara*>(coObjects->at(i)))
+		if (dynamic_cast<CKoopaPara*>(coObjects->at(i)))
 		{
 			continue;
 		}
-		if (dynamic_cast<CBox*>(coObjects->at(i)))
+		if (dynamic_cast<CKoopas*>(coObjects->at(i)))
 		{
-			if (e->nx != 0)
-				continue;
+			continue;
 		}
-		if (dynamic_cast<CFireFlower*>(coObjects->at(i)))
-		{
-			if (e->nx != 0)
-				continue;
-		}
-
 
 		if (e->t > 0 && e->t <= 1.0f)
 			coEvents.push_back(e);
@@ -50,14 +43,15 @@ void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 
 }
 
-
-void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& bottom)
+void CKoopaPara::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
+
+	
 	left = x;
 	top = y;
 	right = x + KOOPAS_BBOX_WIDTH;
 
-	if (state == KOOPAS_STATE_WALKING)
+	if (state == KOOPAS_STATE_WALKING|| state == KOOPAS_STATE_JUMP)
 		bottom = y + KOOPAS_BBOX_HEIGHT;
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT_DIE;
@@ -69,8 +63,14 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 }
 
-void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
+void CKoopaPara::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (GetTickCount() - checkJump >= KOOPAS_TIME_JUMP && state == KOOPAS_STATE_JUMP)
+	{
+		vy = -KOOPAS_JUMP_SPEED_Y;
+		checkJump = GetTickCount();
+	}
+
 	LPSCENE scence = CGame::GetInstance()->GetCurrentScene();
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	//
@@ -91,7 +91,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state != KOOPAS_STATE_HOLD && state != KOOPAS_STATE_HIDE)
 		CalcPotentialCollisions(coObjects, coEvents);
 
-	float tempy=y+dy;
+	float tempy = y + dy;
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
 	{
@@ -111,8 +111,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (state != KOOPAS_STATE_DIE && state != KOOPAS_STATE_THROW && state != KOOPAS_STATE_HIDE)
 		{
 			x += min_tx * dx + nx * 0.4f;
-			if(nx <0)
-			y += min_ty * dy + ny * 0.4f;
+			if (nx < 0)
+				y += min_ty * dy + ny * 0.4f;
 
 		}
 		if (ny != 0) vy = 0;
@@ -153,8 +153,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CBrick*>(e->obj))
 			{
-				
-				if (nx != 0 )
+
+				if (nx != 0)
 				{
 					vx = -vx;
 				}
@@ -208,32 +208,41 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 }
 
-void CKoopas::Render()
+void CKoopaPara::Render()
 {
-	int ani = KOOPAS_ANI_WALKING_LEFT;
+	int ani = KOOPASPARA_ANI_WALKING_LEFT;
 	if (state == KOOPAS_STATE_HOLD)
 	{
-		ani = KOOPAS_ANI_DIE;
+		ani = KOOPASPARA_ANI_DIE;
 	}
 	else
 		if (state == KOOPAS_STATE_DIE) {
 			if (vx != 0)
-				ani = KOOPAS_ANI_TURN;
+				ani = KOOPASPARA_ANI_TURN;
 			else
-				ani = KOOPAS_ANI_DIE;
+				ani = KOOPASPARA_ANI_DIE;
 		}
 		else if (state == KOOPAS_STATE_THROW)
 		{
-			ani = KOOPAS_ANI_TURN;
+			ani = KOOPASPARA_ANI_TURN;
+		}else if(state == KOOPAS_STATE_JUMP)
+			{
+				if (vx > 0) ani = KOOPASPARA_ANI_JUMP_RIGHT;
+				else if (vx < 0) ani = KOOPASPARA_ANI_JUMP_LEFT;
 		}
-		else if (vx > 0) ani = KOOPAS_ANI_WALKING_RIGHT;
-		else if (vx < 0) ani = KOOPAS_ANI_WALKING_LEFT;
+		else
+		{
+			if (vx > 0) ani = KOOPASPARA_ANI_WALKING_RIGHT;
+			else if (vx < 0) ani = KOOPASPARA_ANI_WALKING_LEFT;
+		}
+		
+		
 
 	animation_set->at(ani)->Render(x, y);
 
 }
 
-void CKoopas::SetState(int state)
+void CKoopaPara::SetState(int state)
 {
 	LPSCENE scence = CGame::GetInstance()->GetCurrentScene();
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
@@ -246,23 +255,35 @@ void CKoopas::SetState(int state)
 		vx = 0;
 		vy = 0;
 		break;
+	case KOOPAS_STATE_JUMP:
+		vx = -KOOPAS_WALKING_SPEED;
+		nx = -1;
+		break;
 	case KOOPAS_STATE_WALKING:
-		vx = KOOPAS_WALKING_SPEED;
+		if (nx > 0)
+		{
+			vx = KOOPAS_WALKING_SPEED;
+
+		}
+		else
+		{
+			vx = -KOOPAS_WALKING_SPEED;
+		}
 		break;
 	case KOOPAS_STATE_HOLD:
 		vx = 0;
 		vy = 0;
 		break;
 	case KOOPAS_STATE_HIDE:
-		vy = -0.5f;
+		vy = -KOOPAS_RUN_SPEED_Y;
 		break;
 	case KOOPAS_STATE_THROW:
 		if (mario->nx > 0)
 		{
-			vx = 0.3f;
+			vx = KOOPAS_RUN_SPEED;
 			nx = 1;
 		}
-		else { vx = -0.3f; nx = -1; }
+		else { vx = -KOOPAS_RUN_SPEED; nx = -1; }
 		break;
 	}
 

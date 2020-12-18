@@ -61,7 +61,18 @@ void CHUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	SetPosition(game->GetCamPosX(), game->GetCamPosY() + 260);
 	CMario* mario = ((CPlayScene*)game->GetCurrentScene())->GetPlayer();
 
-	if (mario->GetState() == MARIO_STATE_DIE) return;
+	if (mario->GetState() == MARIO_STATE_DIE)
+	{
+		marioLife = mario->GetLife();
+		string stringLife = to_string(marioLife);
+		while (stringLife.length() < LIFE_LENGTH)
+		{
+			stringLife = "0" + stringLife;
+		}
+		life = StringToSprite(stringLife);
+		return;
+
+	}
 	//Cập nhật thuộc tính
 	tempTime += dt;
 	marioTime = game->GetGameTime() - tempTime / 1000;
@@ -100,6 +111,7 @@ void CHUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	coin = StringToSprite(stringCoin);
 	score = StringToSprite(stringScore);
+	life = StringToSprite(stringLife);
 }
 
 void CHUD::Render()

@@ -8,7 +8,7 @@
 #define MARIO_WALKING_FLY	0.1f 
 #define MARIO_GEARING_MAX	0.051f
 
-#define TIME_FLY	3000
+#define TIME_FLY	5000
 
 
 
@@ -30,6 +30,8 @@
 #define MARIO_STATE_SHOOT_FIRE				500
 #define MARIO_STATE_FLY				501
 #define MARIO_STATE_LANDING				502
+#define MARIO_STATE_DRAIN_1			503
+#define MARIO_STATE_DRAIN_2			504
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -103,6 +105,11 @@
 #define MARIO_ANI_SMALL_HOLDKOOPAS_WALK_RIGHT		70
 #define MARIO_ANI_SMALL_HOLDKOOPAS_WALK_LEFT		71 
 
+#define MARIO_ANI_BIG_DRAIN		72
+#define MARIO_ANI_FIRE_DRAIN		73 
+#define MARIO_ANI_FOX_DRAIN		74 
+#define MARIO_ANI_SMALL_DRAIN		75 
+
 
 #define MARIO_ANI_DIE				8
 
@@ -134,6 +141,19 @@
 #define LANDING_LIMIT_SPEED 0.04
 
 #define MARIO_SCORE 100
+#define MARIO_TIME_DRAIN 1000
+#define MARIO_TIME_DRAIN_1_SPEED	0.05f
+#define MARIO_TIME_DRAIN_2_SPEED	0.05f
+#define MARIO_TIME_DRAIN_1_X 2103
+#define MARIO_TIME_DRAIN_1_Y 270
+#define MARIO_TIME_DRAIN_1_Y_DEFAULT 298
+
+#define MARIO_TIME_DRAIN_2_X 2330
+#define MARIO_TIME_DRAIN_2_Y 118
+#define MARIO_TIME_DRAIN_2_Y_DEFAULT 90
+#define MARIO_SCORE 100
+#define MARIO_FLY_LEVEL 7
+#define MARIO_FLY_LEVEL_SPEED 200
 
 
 class CMario : public CGameObject
@@ -145,6 +165,9 @@ class CMario : public CGameObject
 	int marioCoin = 0;
 	int marioLife = 3;
 	int levelFly = 0;
+	DWORD timeKoopas = 0;
+	DWORD timeDrain = 0;
+	
 
 
 	float start_x;			// initial position of Mario at scene
@@ -156,11 +179,13 @@ public:
 	bool attack = false;	//trạng thái tấn công
 	bool sit = false;	//trạng thái ngồi
 	bool holdKoopas = false;	//trạng thái giữ rùa
+	bool holdKoopasCol = false;	//trạng thái giữ rùa
 	bool flyCan = false;	//trạng thái bay
 	int startRun = 0;	//kiểm tra thời gian có thể bay
 	int stopRun = 0;	//kiểm tra thời gian có thể bay
 	int timeFly = 0;	//kiểm tra thời gian bay
 	bool landingCheck = false;	//kiểm tra hạ cánh
+	DWORD attackCheck = 0;
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
