@@ -16,6 +16,7 @@
 #include "FlowerAttack.h"
 #include "GoombaPara.h"
 #include "KoopaPara.h"
+#include "IntroMario.h"
 #include "FireFlower.h"
 
 
@@ -59,6 +60,13 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_KOOPAPARA	14
 #define OBJECT_TYPE_FLOWER_GREEN	15
 #define OBJECT_TYPE_FLOWER_NORMAL	16
+#define OBJECT_TYPE_INTRO_TYPE_BACKGROUNDBLACK	17
+#define OBJECT_TYPE_INTRO_TYPE_FLOOR	18
+#define OBJECT_TYPE_INTRO_TYPE_ICON_BLACK	19
+#define OBJECT_TYPE_INTRO_TYPE_ICON_COLOR	20
+#define OBJECT_TYPE_INTRO_TYPE_ICON_CHANGE_COLOR	21
+#define OBJECT_TYPE_INTRO_TYPE_ARROW	22
+#define OBJECT_TYPE_INTRO_TYPE_CURTAIN	23
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -66,6 +74,41 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 
 #define MAX_SCENE_LINE 1024
 
+void CPlayScene::SwapButton()
+{
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT obj = objects[i];
+		if (dynamic_cast<CIntroMario*>(obj))
+		{
+			CIntroMario* intro = dynamic_cast<CIntroMario*>(obj);
+			if (intro->getType() == INTRO_TYPE_ARROW)
+			{
+				intro->swapbutton();
+			}
+		}
+	}
+}
+
+void CPlayScene::ChoosePlayer()
+{
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT obj = objects[i];
+		if (dynamic_cast<CIntroMario*>(obj))
+		{
+			CIntroMario* intro = dynamic_cast<CIntroMario*>(obj);
+			if (intro->getType() == INTRO_TYPE_ARROW)
+			{
+				if (intro->getFirst())
+				{
+					CPortal* p =new CPortal(3);
+					CGame::GetInstance()->SwitchScene(p->GetSceneId());
+				}
+			}
+		}
+	}
+}
 
 void CPlayScene::_ParseSection_TEXTURES(string line)
 {
@@ -201,6 +244,13 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_KOOPAPARA:	  obj = new CKoopaPara(); break;
 	case OBJECT_TYPE_FLOWER_GREEN:	  obj = new CFlowerAttack(FLOWER_GREEN); break;
 	case OBJECT_TYPE_FLOWER_NORMAL:	  obj = new CFlowerAttack(FLOWER_NORMAL); break;
+	case OBJECT_TYPE_INTRO_TYPE_BACKGROUNDBLACK:	  obj = new CIntroMario(INTRO_TYPE_BACKGROUNDBLACK); break;
+	case OBJECT_TYPE_INTRO_TYPE_FLOOR:	  obj = new CIntroMario(INTRO_TYPE_FLOOR); break;
+	case OBJECT_TYPE_INTRO_TYPE_ICON_BLACK:	  obj = new CIntroMario(INTRO_TYPE_ICON_BLACK); break;
+	case OBJECT_TYPE_INTRO_TYPE_ICON_COLOR:	  obj = new CIntroMario(INTRO_TYPE_ICON_COLOR); break;
+	case OBJECT_TYPE_INTRO_TYPE_ICON_CHANGE_COLOR:	  obj = new CIntroMario(INTRO_TYPE_ICON_CHANGE_COLOR); break;
+	case OBJECT_TYPE_INTRO_TYPE_ARROW:	  obj = new CIntroMario(INTRO_TYPE_ARROW); break;
+	case OBJECT_TYPE_INTRO_TYPE_CURTAIN:	  obj = new CIntroMario(INTRO_TYPE_CURTAIN); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
@@ -281,7 +331,7 @@ void CPlayScene::Update(DWORD dt)
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
 	// TO-DO: This is a "dirty" way, need a more organized way
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
-
+	if(player!=NULL)
 	if (player->GetState() == MARIO_STATE_SHOOT_FIRE)
 	{
 		CGameObject* obj = NULL;
@@ -324,10 +374,18 @@ void CPlayScene::Update(DWORD dt)
 		{
 			objects.erase(objects.begin() + i);
 			delete obj;
-			
-		}else
-		if(obj->x<=player->x+game->GetScreenWidth())
-		objects[i]->Update(dt, &coObjects);
+		}
+		else
+		{
+			if (player != NULL)
+			{
+				if (obj->x <= player->x + game->GetScreenWidth())
+					objects[i]->Update(dt, &coObjects);
+			}
+			else
+			objects[i]->Update(dt, &coObjects);
+		}
+		
 	}
 
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
@@ -369,68 +427,93 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 
 
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
-	if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
+	if (mario != NULL)
+	{
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
+		{
+			switch (KeyCode)
+			{
+			case DIK_S:
+				if (mario->checkjumping == 0)
+				{
+					if (mario->GetSpeed() == 7 && mario->GetLevel() == MARIO_LEVEL_FOX)
+					{
+						mario->flyCan = true;
+						mario->SetState(MARIO_STATE_FLY);
+						mario->timeFly = GetTickCount();
+					}
+					else if (game->IsKeyDown(DIK_LSHIFT))
+					{
+						mario->SetState(MARIO_STATE_JUMP_HIGH);
+					}
+					else
+					{
+						mario->SetState(MARIO_STATE_JUMP);
+					}
+
+				}
+				break;
+			case DIK_SPACE:
+				if (mario->GetLevel() == MARIO_LEVEL_FOX)
+				{
+					mario->landingCheck = true;
+				}
+				break;
+			case DIK_R:
+				mario->Reset();
+				break;
+			case DIK_A:
+				if (mario->GetLevel() == MARIO_LEVEL_FIRE)
+				{
+					if (mario->vx == 0)
+						mario->SetState(MARIO_STATE_SHOOT_FIRE);
+				}
+				if (mario->GetLevel() == MARIO_LEVEL_FOX)
+				{
+					mario->attackCheck = GetTickCount();
+					mario->attack = true;
+
+				}
+				mario->holdKoopas = true;
+				break;
+			case DIK_I:
+				mario->y -= MARIO_BIG_BBOX_HEIGHT;
+				mario->SetLevel(MARIO_LEVEL_FIRE);
+				break;
+			case DIK_DOWN:
+				mario->sit = true;
+				break;
+			case DIK_O:
+				mario->y -= MARIO_BIG_BBOX_HEIGHT;
+				mario->SetLevel(MARIO_LEVEL_FOX);
+				break;
+			}
+		}
+	}
+	else
 	{
 		switch (KeyCode)
 		{
-		case DIK_S:
-			if (mario->checkjumping == 0)
-			{
-				if (mario->GetSpeed() == 7 && mario->GetLevel() == MARIO_LEVEL_FOX)
-				{
-					mario->flyCan = true;
-					mario->SetState(MARIO_STATE_FLY);
-					mario->timeFly = GetTickCount();
-				}
-				else if (game->IsKeyDown(DIK_LSHIFT))
-				{
-					mario->SetState(MARIO_STATE_JUMP_HIGH);
-				}
-				else
-				{
-					mario->SetState(MARIO_STATE_JUMP);
-				}
-
-			}
-			
+		case DIK_UP:
+		{
+			((CPlayScene*)scence)->SwapButton();
 			break;
-		case DIK_R:
-			mario->Reset();
-			break;
-		case DIK_A:
-			if (mario->GetLevel() == MARIO_LEVEL_FIRE)
-			{
-				if(mario->vx==0)
-				mario->SetState(MARIO_STATE_SHOOT_FIRE);
-			}
-			if (mario->GetLevel() == MARIO_LEVEL_FOX)
-			{
-				mario->attackCheck = GetTickCount();
-				mario->attack = true;
-
-			}
-			mario->holdKoopas = true;
-			break;
-		case DIK_SPACE:
-			if (mario->GetLevel() == MARIO_LEVEL_FOX)
-			{
-					mario->landingCheck = true;
-			}
-			break;
-
-		case DIK_I:
-			mario->y -= MARIO_BIG_BBOX_HEIGHT;
-			mario->SetLevel(MARIO_LEVEL_FIRE);
-			break;
+		}
 		case DIK_DOWN:
-			mario->sit = true;
+		{
+			((CPlayScene*)scence)->SwapButton();
 			break;
-		case DIK_O:
-			mario->y -= MARIO_BIG_BBOX_HEIGHT;
-			mario->SetLevel(MARIO_LEVEL_FOX);
+		}
+		case DIK_A:
+		{
+			((CPlayScene*)scence)->ChoosePlayer();
+			break;
+		}
+		default:
 			break;
 		}
 	}
+	
 	
 }
 
@@ -440,44 +523,48 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 
 
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
-	if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
+	if (mario != NULL)
 	{
-		switch (KeyCode)
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
 		{
-		
-		case DIK_A:
-			mario->holdKoopas = false;
-			mario->attack = false;
-			mario->stopRun = GetTickCount();
-			mario->startRun = 0;
-			break;
-		case DIK_S:
-			if (mario->flyCan == true)
+			switch (KeyCode)
 			{
-				mario->SetState(MARIO_STATE_LANDING);
-				mario->landingCheck = true;
-			}
-			mario->flyCan = false;
-			mario->timeFly = 0;
-			mario->landingCheck = false;
-			mario->holdKoopasCol = false;
-			break;
-		case DIK_DOWN:
-			mario->sit = false;
-			if (mario->GetLevel() != MARIO_LEVEL_SMALL)
-				mario->y -= MARIO_SIT_BBOX_HEIGHT;
-			break;
-		case DIK_RIGHT:
-			mario->stopRun = GetTickCount();
-			mario->startRun = 0;
-		case DIK_LEFT:
-			mario->stopRun = GetTickCount();
-			mario->startRun = 0;
 
-		default:
-			break;
+			case DIK_A:
+				mario->holdKoopas = false;
+				mario->attack = false;
+				mario->stopRun = GetTickCount();
+				mario->startRun = 0;
+				break;
+			case DIK_S:
+				if (mario->flyCan == true)
+				{
+					mario->SetState(MARIO_STATE_LANDING);
+					mario->landingCheck = true;
+				}
+				mario->flyCan = false;
+				mario->timeFly = 0;
+				mario->landingCheck = false;
+				mario->holdKoopasCol = false;
+				break;
+			case DIK_DOWN:
+				mario->sit = false;
+				if (mario->GetLevel() != MARIO_LEVEL_SMALL)
+					mario->y -= MARIO_SIT_BBOX_HEIGHT;
+				break;
+			case DIK_RIGHT:
+				mario->stopRun = GetTickCount();
+				mario->startRun = 0;
+			case DIK_LEFT:
+				mario->stopRun = GetTickCount();
+				mario->startRun = 0;
+
+			default:
+				break;
+			}
 		}
 	}
+	
 	
 }
 
@@ -487,52 +574,57 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 
 	// disable control key when Mario die 
-	if (mario->GetState() == MARIO_STATE_DIE) return;
-
-	if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
+	if (mario != NULL)
 	{
-		if (game->IsKeyDown(DIK_RIGHT))
-		{
-			if (game->IsKeyDown(DIK_A))
-			{
-				mario->SetState(MARIO_STATE_WALKING_RIGHT_FAST);
-				if (mario->vx != 0)
-				{
-					if (mario->startRun == 0)
-					{
-						mario->startRun = GetTickCount();
-						mario->stopRun = 0;
-					}
+		if (mario->GetState() == MARIO_STATE_DIE) return;
 
-				}
-			}
-			else
-				mario->SetState(MARIO_STATE_WALKING_RIGHT);
-		}
-		else if (game->IsKeyDown(DIK_LEFT))
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
 		{
-			if (game->IsKeyDown(DIK_A))
+			if (game->IsKeyDown(DIK_RIGHT))
 			{
-				mario->SetState(MARIO_STATE_WALKING_LEFT_FAST);
-				if (mario->vx != 0)
+				if (game->IsKeyDown(DIK_A))
 				{
-					if (mario->startRun == 0)
+					mario->SetState(MARIO_STATE_WALKING_RIGHT_FAST);
+					if (mario->vx != 0)
 					{
-						mario->startRun = GetTickCount();
-						mario->stopRun = 0;
+						if (mario->startRun == 0)
+						{
+							mario->startRun = GetTickCount();
+							mario->stopRun = 0;
+						}
+
 					}
 				}
+				else
+					mario->SetState(MARIO_STATE_WALKING_RIGHT);
 			}
+			else if (game->IsKeyDown(DIK_LEFT))
+			{
+				if (game->IsKeyDown(DIK_A))
+				{
+					mario->SetState(MARIO_STATE_WALKING_LEFT_FAST);
+					if (mario->vx != 0)
+					{
+						if (mario->startRun == 0)
+						{
+							mario->startRun = GetTickCount();
+							mario->stopRun = 0;
+						}
+					}
+				}
+				else
+					mario->SetState(MARIO_STATE_WALKING_LEFT);
+			}
+			/*else if (game->IsKeyDown(DIK_R))
+			{
+				if (mario->GetLevel() == MARIO_LEVEL_FOX)
+					mario->SetState(MARIO_STATE_ATTACK);
+			}*/
 			else
-				mario->SetState(MARIO_STATE_WALKING_LEFT);
+				mario->SetState(MARIO_STATE_IDLE);
 		}
-		/*else if (game->IsKeyDown(DIK_R))
-		{
-			if (mario->GetLevel() == MARIO_LEVEL_FOX)
-				mario->SetState(MARIO_STATE_ATTACK);
-		}*/
-		else
-			mario->SetState(MARIO_STATE_IDLE);
 	}
 	
+	
 }
+

@@ -132,7 +132,7 @@ void CGoomba::SetState(int state)
 	{
 		case GOOMBA_STATE_DIE:
 			vx = 0;
-			vy = -0.5f;
+			vy = -0.2f;
 			break;
 		case GOOMBA_STATE_WALKING: 
 			vx = -GOOMBA_WALKING_SPEED;

@@ -137,6 +137,7 @@
     <ClCompile Include="FlowerAttack.cpp" />
     <ClCompile Include="GoombaPara.cpp" />
     <ClCompile Include="HUD.cpp" />
+    <ClCompile Include="IntroMario.cpp" />
     <ClCompile Include="KoopaPara.cpp" />
     <ClCompile Include="Koopas.cpp" />
     <ClCompile Include="Leaf.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="FlowerAttack.h" />
     <ClInclude Include="GoombaPara.h" />
     <ClInclude Include="HUD.h" />
+    <ClInclude Include="IntroMario.h" />
     <ClInclude Include="KoopaPara.h" />
     <ClInclude Include="Koopas.h" />
     <ClInclude Include="Leaf.h" />

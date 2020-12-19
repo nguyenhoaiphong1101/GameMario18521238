@@ -1,11 +1,23 @@
 # id	file_path	transparent_color_r	g	b
 [TEXTURES]
 0	textures\black.png	10	10	10
-10	textures\misc.png	100	100	100
-20	textures\enemies.png	255	255	255
+10	textures\title.png	100	100	100
+20	textures\title.png	255	255	255
+30	textures\mario.png	255	255	255
 
 # id	left	top	right	bottom	texture_id
 [SPRITES]
+
+#Mario LEFT
+5002	35	155	54	181	30
+5003	65	154	84	181	30
+5004	93	154	112	181	30
+
+#Mario RIGHT
+5012	334	154	353	181	30
+5013	362	154	381	181	30
+5014	392	155	411	181	30
+
 # Floor
 10001	0	188	256	244	10
 
@@ -27,6 +39,9 @@
 						
 # ani_id	sprite1_id	time1	sprite2_id	time2	...
 [ANIMATIONS]
+#Mario lefr
+5001	5004	100	5003	100	5002	100
+5002	5012	100	5013	100	5014	100
 
 #Floor
 10001	10001	100
@@ -53,49 +68,16 @@
 # id	ani1	ani2	ani3
 #
 [ANIMATION_SETS]
-#Floor
-10001	10001
-
-#Background black
-20001	20001
-
-#Tile
-30001	30001
-
-#logo-black
-40001	40001
-
-#logo-color
-50001	50001
-
-#logo-number
-60001	60001
-
-#Arrow
-70001	70001
+1	20001	10001	40001	50001	60001	70001	30001	5001	5002
 [OBJECTS]
 # type	x	y	ani_set_id	extra_settings per object type
 # type: 0 = Mario , 1 = Brick, 2 = Goomba
-#Background black
--1	0	0	20001
-#Floor
--1	0	186	10001
-#tile
-9	0	0	30001
-#tile
-10	0	0	30001
+17	0	0	1
+18	55	187	1
 
-#logo black
-11	0	-200	40001
 
-#logo color
-12	0	0	50001
+19	55	-374	1
+23	55	0	1
 
-#logo number
-13	112	96	60001
-
-#Arrow
-14	70	144	70001
-14	70	160	70001
 
 

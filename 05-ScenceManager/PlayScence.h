@@ -33,7 +33,10 @@ public:
 	virtual void Update(DWORD dt);
 	virtual void Render();
 	virtual void Unload();
+	void SwapButton();
+	void ChoosePlayer();
 
+	vector<LPGAMEOBJECT> getObject() { return objects; };
 	CMario * GetPlayer() { return player; } 
 
 	//friend class CPlayScenceKeyHandler;

@@ -74,6 +74,14 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	if (marioLife == 0)
+	{
+		CGame::GetInstance()->SetCamPos((int)0, (int)0);
+		CPortal* p = new CPortal(1);
+		CGame::GetInstance()->SwitchScene(p->GetSceneId());
+
+		return;
+	}
 	if (GetState() == MARIO_STATE_DIE)
 	{
 		Reset();
@@ -122,11 +130,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 		x += dx;
 		y += dy;
+		checkFree = true;
 
 	}
 	else
 	{
-
+		checkFree = false;
 		float min_tx, min_ty, nx = 0, ny;
 		float rdx = 0;
 		float rdy = 0;

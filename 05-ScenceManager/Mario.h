@@ -185,6 +185,7 @@ public:
 	int stopRun = 0;	//kiểm tra thời gian có thể bay
 	int timeFly = 0;	//kiểm tra thời gian bay
 	bool landingCheck = false;	//kiểm tra hạ cánh
+	bool checkFree = false;	
 	DWORD attackCheck = 0;
 
 	CMario(float x = 0.0f, float y = 0.0f);
