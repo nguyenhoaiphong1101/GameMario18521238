@@ -18,6 +18,7 @@
 #include "KoopaPara.h"
 #include "IntroMario.h"
 #include "FireFlower.h"
+#include "MarioSwitchMap.h"
 
 
 
@@ -67,6 +68,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_INTRO_TYPE_ICON_CHANGE_COLOR	21
 #define OBJECT_TYPE_INTRO_TYPE_ARROW	22
 #define OBJECT_TYPE_INTRO_TYPE_CURTAIN	23
+#define OBJECT_TYPE_MARIO_SWITCH_MAP	24
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -102,10 +104,83 @@ void CPlayScene::ChoosePlayer()
 			{
 				if (intro->getFirst())
 				{
+					CPortal* p =new CPortal(2);
+					CGame::GetInstance()->SwitchScene(p->GetSceneId());
+				}
+			}
+		}
+	}
+}
+void CPlayScene::ChooseMap()
+{
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT obj = objects[i];
+		if (dynamic_cast<CMarioSwitchMap*>(obj))
+		{
+			CMarioSwitchMap* marioSW = dynamic_cast<CMarioSwitchMap*>(obj);
+			if (marioSW->getFirst())
+			{
+				if (marioSW->getFirst())
+				{
 					CPortal* p =new CPortal(3);
 					CGame::GetInstance()->SwitchScene(p->GetSceneId());
 				}
 			}
+		}
+	}
+}
+
+void CPlayScene::runLeft()
+{
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT obj = objects[i];
+		if (dynamic_cast<CMarioSwitchMap*>(obj))
+		{
+			CMarioSwitchMap* marioSM= dynamic_cast<CMarioSwitchMap*>(obj);
+				marioSM->runLeft();
+		}
+	}
+}
+void CPlayScene::runRight()
+{
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT obj = objects[i];
+		if (dynamic_cast<CMarioSwitchMap*>(obj))
+		{
+			CMarioSwitchMap* marioSM = dynamic_cast<CMarioSwitchMap*>(obj);
+			if (!marioSM->getFirst())
+			{
+				marioSM->runRight();
+				int a = marioSM->x;
+			}
+		}
+	}
+}
+void CPlayScene::runDown()
+{
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT obj = objects[i];
+		if (dynamic_cast<CMarioSwitchMap*>(obj))
+		{
+			CMarioSwitchMap* marioSM = dynamic_cast<CMarioSwitchMap*>(obj);
+			
+				marioSM->runDown();
+		}
+	}
+}
+void CPlayScene::runUp()
+{
+	for (size_t i = 0; i < objects.size(); i++)
+	{
+		LPGAMEOBJECT obj = objects[i];
+		if (dynamic_cast<CMarioSwitchMap*>(obj))
+		{
+			CMarioSwitchMap* marioSM = dynamic_cast<CMarioSwitchMap*>(obj);
+			marioSM->runUp();
 		}
 	}
 }
@@ -251,6 +326,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_INTRO_TYPE_ICON_CHANGE_COLOR:	  obj = new CIntroMario(INTRO_TYPE_ICON_CHANGE_COLOR); break;
 	case OBJECT_TYPE_INTRO_TYPE_ARROW:	  obj = new CIntroMario(INTRO_TYPE_ARROW); break;
 	case OBJECT_TYPE_INTRO_TYPE_CURTAIN:	  obj = new CIntroMario(INTRO_TYPE_CURTAIN); break;
+	case OBJECT_TYPE_MARIO_SWITCH_MAP:	  obj = new CMarioSwitchMap(); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
@@ -494,19 +570,34 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	{
 		switch (KeyCode)
 		{
+		case DIK_RIGHT:
+		{
+			((CPlayScene*)scence)->runRight();
+			break;
+		}
+		case DIK_LEFT:
+		{
+			((CPlayScene*)scence)->runLeft();
+			break;
+		}
+		
+			
 		case DIK_UP:
 		{
+			((CPlayScene*)scence)->runUp();
 			((CPlayScene*)scence)->SwapButton();
 			break;
 		}
 		case DIK_DOWN:
 		{
+			((CPlayScene*)scence)->runDown();
 			((CPlayScene*)scence)->SwapButton();
 			break;
 		}
 		case DIK_A:
 		{
 			((CPlayScene*)scence)->ChoosePlayer();
+			((CPlayScene*)scence)->ChooseMap();
 			break;
 		}
 		default:

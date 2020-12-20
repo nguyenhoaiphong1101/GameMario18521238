@@ -10,6 +10,7 @@ CHUD::CHUD()
 {
 	CGame* game = CGame::GetInstance();
 	CMario* mario = ((CPlayScene*)game->GetCurrentScene())->GetPlayer();
+
 	CSprites* sprites = CSprites::GetInstance();
 
 
@@ -26,22 +27,19 @@ CHUD::CHUD()
 		{
 			storePowerNull.push_back(sprites->Get(HUD_ARROW_BLACK_SPRITE));
 			storePower.push_back(sprites->Get(HUD_ARROW_WHITE_SPRITE));
-		} 
+		}
 		else
 		{
 			storePowerNull.push_back(sprites->Get(HUD_POWER_BLACK_SPRITE));
 			storePower.push_back(sprites->Get(HUD_POWER_WHITE_SPRITE));
 		}
-			
+
 	}
-	
 
 	storePowerNullStack = mario->GetSpeed();
 	marioCoin = mario->GetCoin();
 	marioScore = mario->GetScore();
 	marioLife = mario->GetLife();
-
-
 }
 
 void CHUD::resetHUD()
@@ -60,7 +58,6 @@ void CHUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	CGame* game = CGame::GetInstance();
 	SetPosition(game->GetCamPosX(), game->GetCamPosY() + 260);
 	CMario* mario = ((CPlayScene*)game->GetCurrentScene())->GetPlayer();
-
 	if (mario->GetState() == MARIO_STATE_DIE)
 	{
 		marioLife = mario->GetLife();
@@ -76,17 +73,21 @@ void CHUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	//Cập nhật thuộc tính
 	tempTime += dt;
 	marioTime = game->GetGameTime() - tempTime / 1000;
+
 	storePowerNullStack = mario->GetSpeed();
 	marioCoin = mario->GetCoin();
 	marioScore = mario->GetScore();
 	marioLife = mario->GetLife();
-	
+
+
 	if (marioTime == 0)
 	{
 		mario->SetState(MARIO_STATE_DIE);
 	}
 
-	
+
+
+
 	string stringLife = to_string(marioLife);
 	string stringCoin = to_string(marioCoin);
 	string stringTime = to_string(marioTime);
@@ -112,6 +113,7 @@ void CHUD::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	coin = StringToSprite(stringCoin);
 	score = StringToSprite(stringScore);
 	life = StringToSprite(stringLife);
+
 }
 
 void CHUD::Render()
@@ -211,7 +213,7 @@ LPSPRITE CHUD::getHUD(char a)
 		break;
 	}
 
-	
+
 }
 
 

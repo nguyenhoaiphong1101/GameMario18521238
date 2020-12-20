@@ -35,6 +35,11 @@ public:
 	virtual void Unload();
 	void SwapButton();
 	void ChoosePlayer();
+	void runLeft();
+	void runRight();
+	void runUp();
+	void runDown();
+	void ChooseMap();
 
 	vector<LPGAMEOBJECT> getObject() { return objects; };
 	CMario * GetPlayer() { return player; } 

@@ -22,11 +22,13 @@ void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 		if (dynamic_cast<CGoomba*>(coObjects->at(i)))
 		{
+			if(GetState()!= KOOPAS_STATE_THROW)
 			continue;
 		}
 		if (dynamic_cast<CGoombaPara*>(coObjects->at(i)))
 		{
-			continue;
+			if (GetState() != KOOPAS_STATE_THROW)
+				continue;
 		}
 		if (dynamic_cast<CBox*>(coObjects->at(i)))
 		{
@@ -135,6 +137,29 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						mario->ScoreUp();
 						goomba->SetState(GOOMBA_STATE_DIE_DOWN);
 					}
+				}
+			}
+			if (dynamic_cast<CGoombaPara*>(e->obj)) // if e->obj is Goomba 
+			{
+				CGoombaPara* goomba = dynamic_cast<CGoombaPara*>(e->obj);
+
+				if (state == KOOPAS_STATE_THROW)
+				{
+					if (goomba->GetState() != GOOMBA_STATE_DIE)
+					{
+						mario->ScoreUp();
+						goomba->SetState(GOOMBA_STATE_DIE_DOWN);
+					}
+				}
+			}
+			if (dynamic_cast<CKoopas*>(e->obj)) // if e->obj is Goomba 
+			{
+				CKoopas* goomba = dynamic_cast<CKoopas*>(e->obj);
+
+				if (state == KOOPAS_STATE_THROW)
+				{
+						mario->ScoreUp();
+						goomba->SetState(GOOMBA_STATE_DIE_DOWN);
 				}
 			}
 			if (dynamic_cast<CBox*>(e->obj))

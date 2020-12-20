@@ -91,16 +91,16 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					y += vy * dt;
 					x += dx;
 				}
-				/*else
+				if (nx != 0)
 				{
-					x = -100;
-				}*/
+					isDisAppear = true;
+				}
 			}
 			if (dynamic_cast<CDrain*>(e->obj))
 			{
 				if (e->nx != 0)
 				{
-					x = -100;
+					isDisAppear = true;
 				}
 			}
 			if (dynamic_cast<CBox*>(e->obj))

@@ -268,95 +268,93 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CKoopas*>(e->obj))
 			{
 				CKoopas* koopas = dynamic_cast<CKoopas*>(e->obj);
-				if (level == MARIO_LEVEL_FOX && attack == true)
+				if (holdKoopas == true && koopas->GetState() == KOOPAS_STATE_DIE && holdKoopasCol == false)
+				{
+					holdKoopasCol = true;
+					koopas->SetState(KOOPAS_STATE_HOLD);
+				}
+				else if (level == MARIO_LEVEL_FOX && attack == true)
 				{
 					if (koopas->GetState() != KOOPAS_STATE_HIDE)
 					{
 						koopas->SetState(KOOPAS_STATE_HIDE);
 					}
 				}
-				else
-					if (holdKoopas == true && koopas->GetState() == KOOPAS_STATE_DIE)
+				else if (e->ny < 0)
+				{
+					if (koopas->GetState() != KOOPAS_STATE_DIE)
 					{
-						holdKoopasCol = true;
-						koopas->SetState(KOOPAS_STATE_HOLD);
+						if (koopas->GetState() != KOOPAS_STATE_THROW)
+							marioScore += MARIO_SCORE;
+						koopas->SetState(KOOPAS_STATE_DIE);
+						vy = -MARIO_JUMP_DEFLECT_SPEED;
 					}
 					else
-						if (e->ny < 0)
+					{
+						koopas->vx = 0;
+					}
+				}
+				else if (e->nx != 0)
+				{
+					if (untouchable == 0)
+					{
+						if (koopas->GetState() != KOOPAS_STATE_DIE)
 						{
-							if (koopas->GetState() != KOOPAS_STATE_DIE)
+							if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
 							{
-								if (koopas->GetState() != KOOPAS_STATE_THROW)
-									marioScore += MARIO_SCORE;
-								koopas->SetState(KOOPAS_STATE_DIE);
-								vy = -MARIO_JUMP_DEFLECT_SPEED;
+								level = MARIO_LEVEL_BIG;
+								StartUntouchable();
 							}
 							else
-							{
-								koopas->vx = 0;
-							}
-						}
-						else if (e->nx != 0)
-						{
-							if (untouchable == 0)
-							{
-								if (koopas->GetState() != KOOPAS_STATE_DIE)
+								if (level == MARIO_LEVEL_BIG)
 								{
-									if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
-									{
-										level = MARIO_LEVEL_BIG;
-										StartUntouchable();
-									}
-									else
-										if (level == MARIO_LEVEL_BIG)
-										{
-											level = MARIO_LEVEL_SMALL;
-											StartUntouchable();
-										}
-										else
-										{
-											SetState(MARIO_STATE_DIE);
-										}
+									level = MARIO_LEVEL_SMALL;
+									StartUntouchable();
 								}
 								else
 								{
-									if (koopas->vx != 0)
+									SetState(MARIO_STATE_DIE);
+								}
+						}
+						else
+						{
+							if (koopas->vx != 0)
+							{
+								if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
+								{
+									level = MARIO_LEVEL_BIG;
+									StartUntouchable();
+								}
+								else
+								{
+									if (level == MARIO_LEVEL_BIG)
 									{
-										if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
-										{
-											level = MARIO_LEVEL_BIG;
-											StartUntouchable();
-										}
-										else
-										{
-											if (level == MARIO_LEVEL_BIG)
-											{
-												level = MARIO_LEVEL_SMALL;
-												StartUntouchable();
-											}
-											else
-											{
-												SetState(MARIO_STATE_DIE);
-											}
-										}
-
+										level = MARIO_LEVEL_SMALL;
+										StartUntouchable();
 									}
 									else
 									{
-										if (nx > 0)
-										{
-											koopas->vx = -KOOPAS_RUN_SPEED;
-										}
-
-										else
-										{
-											koopas->vx = +KOOPAS_RUN_SPEED;
-										}
-
+										SetState(MARIO_STATE_DIE);
 									}
 								}
+
+							}
+							else
+							{
+								if (nx > 0)
+								{
+									koopas->vx = -KOOPAS_RUN_SPEED;
+								}
+
+								else
+								{
+									koopas->vx = +KOOPAS_RUN_SPEED;
+								}
+
 							}
 						}
+					}
+				}
 			}
 			if (dynamic_cast<CKoopaPara*>(e->obj))
 			{
@@ -458,11 +456,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							}
 						}
 			}
-			if (dynamic_cast<CPortal*>(e->obj))
-			{
-				CPortal* p = dynamic_cast<CPortal*>(e->obj);
-				CGame::GetInstance()->SwitchScene(p->GetSceneId());
-			}
+			
 			if (dynamic_cast<CCoin*>(e->obj))
 			{
 				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
@@ -587,6 +581,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else
 			{
 				if (ny != 0 && flyCan != true) vy = 0;
+			}
+			if (dynamic_cast<CPortal*>(e->obj))
+			{
+				CPortal* p = dynamic_cast<CPortal*>(e->obj);
+				CGame::GetInstance()->SwitchScene(p->GetSceneId());
+				CGame::GetInstance()->SetCamPos((int)0, (int)0);
+				return;
 			}
 		}
 	}
@@ -1111,7 +1112,7 @@ void CMario::Render()
 						ani = MARIO_ANI_FOX_JUMP_LEFT;
 					else ani = MARIO_ANI_FOX_JUMP_RIGHT;
 				}
-				
+
 				if (holdKoopas == true && holdKoopasCol == true)
 				{
 					if (vx == 0)
