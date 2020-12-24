@@ -19,6 +19,7 @@
 #include "KoopaPara.h"
 #include "FireFlower.h"
 #include "FlowerAttack.h"
+#include "BrickBroken.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -65,6 +66,11 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 			nx = 0;
 			ny = 0;
 		}
+		if (dynamic_cast<CKoopaPara*>(c->obj))
+		{
+			nx = 0;
+			ny = 0;
+		}
 	}
 
 	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
@@ -74,6 +80,25 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	CGameObject::Update(dt);
+
+	// Simple fall down
+	if (flyCan == false && landingCheck == false && state != MARIO_STATE_DRAIN_1 && state != MARIO_STATE_DRAIN_2)
+		vy += MARIO_GRAVITY * dt;
+
+	vector<LPCOLLISIONEVENT> coEvents;
+	vector<LPCOLLISIONEVENT> coEventsResult;
+
+	coEvents.clear();
+
+	if (state != MARIO_STATE_DIE && state != MARIO_STATE_DRAIN_1 && state != MARIO_STATE_DRAIN_2)
+	{
+		CalcPotentialCollisions(coObjects, coEvents);
+	}
+
+	// Calculate dx, dy 
+
+
 	if (marioLife == 0)
 	{
 		CGame::GetInstance()->SetCamPos((int)0, (int)0);
@@ -86,23 +111,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		Reset();
 	}
-	// Calculate dx, dy 
-	CGameObject::Update(dt);
-
-	// Simple fall down
-	if (flyCan == false && landingCheck == false && state != MARIO_STATE_DRAIN_1 && state != MARIO_STATE_DRAIN_2)
-		vy += MARIO_GRAVITY * dt;
 
 
 
-	vector<LPCOLLISIONEVENT> coEvents;
-	vector<LPCOLLISIONEVENT> coEventsResult;
 
-	coEvents.clear();
 
 	// turn off collision when die 
-	if (state != MARIO_STATE_DIE && state != MARIO_STATE_DRAIN_1 && state != MARIO_STATE_DRAIN_2)
-		CalcPotentialCollisions(coObjects, coEvents);
+
 
 	// reset untouchable timer if untouchable time has passed
 	if (GetTickCount() - untouchable_start > MARIO_UNTOUCHABLE_TIME)
@@ -356,107 +371,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 			}
-			if (dynamic_cast<CKoopaPara*>(e->obj))
-			{
-				CKoopaPara* koopas = dynamic_cast<CKoopaPara*>(e->obj);
-				if (level == MARIO_LEVEL_FOX && attack == true)
-				{
-					if (koopas->GetState() != KOOPAS_STATE_HIDE)
-					{
-						koopas->SetState(KOOPAS_STATE_HIDE);
-					}
-				}
-				else
-					if (holdKoopas == true && koopas->GetState() == KOOPAS_STATE_DIE)
-					{
-						koopas->SetState(KOOPAS_STATE_HOLD);
-					}
-					else
-						if (e->ny < 0)
-						{
-							if (koopas->GetState() != KOOPAS_STATE_THROW)
-							{
-								if (koopas->GetState() != KOOPAS_STATE_DIE)
-								{
-									if (koopas->GetState() == KOOPAS_STATE_JUMP)
-									{
-										koopas->SetState(KOOPAS_STATE_WALKING);
-									}
-									else if (koopas->GetState() == KOOPAS_STATE_WALKING)
-									{
-										koopas->SetState(KOOPAS_STATE_DIE);
-									}
-								}
-							}
-							else
-							{
-								koopas->SetState(KOOPAS_STATE_DIE);
-								koopas->vx = 0;
-							}
-						}
-						else if (e->nx != 0)
-						{
-							if (untouchable == 0)
-							{
-								if (koopas->GetState() != KOOPAS_STATE_DIE)
-								{
-									if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
-									{
-										level = MARIO_LEVEL_BIG;
-										StartUntouchable();
-									}
-									else
-										if (level == MARIO_LEVEL_BIG)
-										{
-											level = MARIO_LEVEL_SMALL;
-											StartUntouchable();
-										}
-										else
-										{
-											SetState(MARIO_STATE_DIE);
-										}
-								}
-								else
-								{
-									if (koopas->vx != 0)
-									{
-										if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
-										{
-											level = MARIO_LEVEL_BIG;
-											StartUntouchable();
-										}
-										else
-										{
-											if (level == MARIO_LEVEL_BIG)
-											{
-												level = MARIO_LEVEL_SMALL;
-												StartUntouchable();
-											}
-											else
-											{
-												SetState(MARIO_STATE_DIE);
-											}
-										}
-
-									}
-									else
-									{
-										if (nx > 0)
-										{
-											koopas->vx = -KOOPAS_RUN_SPEED;
-										}
-
-										else
-										{
-											koopas->vx = +KOOPAS_RUN_SPEED;
-										}
-
-									}
-								}
-							}
-						}
-			}
 			
+
 			if (dynamic_cast<CCoin*>(e->obj))
 			{
 				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
@@ -581,6 +497,122 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			else
 			{
 				if (ny != 0 && flyCan != true) vy = 0;
+			}
+			if (dynamic_cast<CBrickBroken*>(e->obj))
+			{
+				if (level == MARIO_LEVEL_FOX)
+				{
+					if (attack == true)
+					{
+						CBrickBroken* brick = dynamic_cast<CBrickBroken*>(e->obj);
+						if (brick->GetState()== BRICK_BROKEN_STATE_SHOW)
+						{
+							brick->SetState(BRICK_BROKEN_STATE_HIDE);
+						}
+					}
+				}
+			}
+			if (dynamic_cast<CKoopaPara*>(e->obj))
+			{
+				CKoopaPara* koopas = dynamic_cast<CKoopaPara*>(e->obj);
+				if (level == MARIO_LEVEL_FOX && attack == true)
+				{
+					if (koopas->GetState() != KOOPAS_STATE_HIDE)
+					{
+						koopas->SetState(KOOPAS_STATE_HIDE);
+					}
+				}
+				else
+					if (holdKoopas == true && koopas->GetState() == KOOPAS_STATE_DIE)
+					{
+						koopas->SetState(KOOPAS_STATE_HOLD);
+					}
+					else
+						if (e->ny < 0)
+						{
+							if (koopas->GetState() != KOOPAS_STATE_THROW)
+							{
+								if (koopas->GetState() != KOOPAS_STATE_DIE)
+								{
+									if (koopas->GetState() == KOOPAS_STATE_JUMP)
+									{
+										koopas->SetState(KOOPAS_STATE_WALKING);
+									}
+									else if (koopas->GetState() == KOOPAS_STATE_WALKING)
+									{
+										koopas->SetState(KOOPAS_STATE_DIE);
+									}
+								}
+							}
+							else
+							{
+								koopas->SetState(KOOPAS_STATE_DIE);
+								koopas->vx = 0;
+							}
+							vy = -MARIO_JUMP_DEFLECT_SPEED;
+							vx = vx * 1.2;
+						}
+						else if (e->nx != 0)
+						{
+							if (untouchable == 0)
+							{
+								if (koopas->GetState() != KOOPAS_STATE_DIE)
+								{
+									if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
+									{
+										level = MARIO_LEVEL_BIG;
+										StartUntouchable();
+									}
+									else
+										if (level == MARIO_LEVEL_BIG)
+										{
+											level = MARIO_LEVEL_SMALL;
+											StartUntouchable();
+										}
+										else
+										{
+											SetState(MARIO_STATE_DIE);
+										}
+								}
+								else
+								{
+									if (koopas->vx != 0)
+									{
+										if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
+										{
+											level = MARIO_LEVEL_BIG;
+											StartUntouchable();
+										}
+										else
+										{
+											if (level == MARIO_LEVEL_BIG)
+											{
+												level = MARIO_LEVEL_SMALL;
+												StartUntouchable();
+											}
+											else
+											{
+												SetState(MARIO_STATE_DIE);
+											}
+										}
+
+									}
+									else
+									{
+										if (nx > 0)
+										{
+											koopas->vx = -KOOPAS_RUN_SPEED;
+										}
+
+										else
+										{
+											koopas->vx = +KOOPAS_RUN_SPEED;
+										}
+
+									}
+								}
+							}
+						}
 			}
 			if (dynamic_cast<CPortal*>(e->obj))
 			{

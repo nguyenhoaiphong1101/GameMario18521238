@@ -19,6 +19,7 @@
 #include "IntroMario.h"
 #include "FireFlower.h"
 #include "MarioSwitchMap.h"
+#include "BrickBroken.h"
 
 
 
@@ -69,6 +70,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_INTRO_TYPE_ARROW	22
 #define OBJECT_TYPE_INTRO_TYPE_CURTAIN	23
 #define OBJECT_TYPE_MARIO_SWITCH_MAP	24
+#define OBJECT_TYPE_BRICK_BROKEN	25
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -327,6 +329,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_INTRO_TYPE_ARROW:	  obj = new CIntroMario(INTRO_TYPE_ARROW); break;
 	case OBJECT_TYPE_INTRO_TYPE_CURTAIN:	  obj = new CIntroMario(INTRO_TYPE_CURTAIN); break;
 	case OBJECT_TYPE_MARIO_SWITCH_MAP:	  obj = new CMarioSwitchMap(); break;
+	case OBJECT_TYPE_BRICK_BROKEN:	  obj = new CBrickBroken(); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
@@ -456,7 +459,13 @@ void CPlayScene::Update(DWORD dt)
 			if (player != NULL)
 			{
 				if (obj->x <= player->x + game->GetScreenWidth())
+				{
+					if (dynamic_cast<CHUD*>(obj))
+					{
+						objects[i]->Update(dt, &coObjects);
+					}else if(obj->y>=player->y-game->GetScreenHeight()&& obj->y <= player->y + game->GetScreenHeight())
 					objects[i]->Update(dt, &coObjects);
+				}
 			}
 			else
 			objects[i]->Update(dt, &coObjects);

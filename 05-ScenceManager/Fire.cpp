@@ -4,6 +4,7 @@
 #include "Box.h"
 #include "Drain.h"
 #include "Koopas.h"
+#include "GoombaPara.h"
 
 
 void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
@@ -63,6 +64,17 @@ void CFire::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				x = -100;
 
+			}
+			if (dynamic_cast<CGoombaPara*>(e->obj)) // if e->obj is Goomba 
+			{
+				CGoombaPara* goomba = dynamic_cast<CGoombaPara*>(e->obj);
+
+
+				if (goomba->GetState() != GOOMBA_STATE_DIE)
+				{
+					goomba->SetState(GOOMBA_STATE_DIE);
+				}
+				x = -100;
 			}
 			if (dynamic_cast<CKoopas*>(e->obj))
 			{
