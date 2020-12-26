@@ -9,22 +9,11 @@ class CMarioSwitchMap : public CGameObject
 	bool second = false;
 	DWORD time;
 public:
+	CMarioSwitchMap() { vx = 0; vy = 0; };
 	virtual void Render();
 	virtual void GetBoundingBox(float& l, float& t, float& r, float& b);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);
-	void swapbutton()
-	{
-		if (first == true)
-		{
-			second = true;
-			first = false;
-		}
-		else
-		{
-			first = true;
-			second = false;
-		}
-	};
+	
 	bool getFirst() { return first; };
 	bool getSecond() { return second; };
 	void runLeft();

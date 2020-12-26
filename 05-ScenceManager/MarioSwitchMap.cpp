@@ -2,65 +2,85 @@
 
 void CMarioSwitchMap::runLeft()
 {
-	if (x == 117)
+	if (x == 117 && y == 58)
 	{
-		if(y==58 )
-		for (int i = 0; i < KHOANGCACH_X; i++)
-		{
-			x--;
-			animation_set->at(0)->Render(x, y);
-		}
+		vx = -0.04f;
+		vy = 0;
 	}
-	
 }
 void CMarioSwitchMap::runRight()
 {
-	if (x == 117)
+	if (x == 86 && y == 58)
 	{
-		if(y!=58)
-		for (int i = 0; i < KHOANGCACH_X; i++)
-		{
-			x++;
-			animation_set->at(0)->Render(x, y);
-		}
-	}
-	else
-	{
-		for (int i = 0; i < KHOANGCACH_X; i++)
-		{
-			x++;
-			animation_set->at(0)->Render(x, y);
-		}
+		vx = 0.04f;
+		vy = 0;
 	}
 }
 void CMarioSwitchMap::runUp()
 {
-	if (x != 86)
+	if (x == 117 && y == 58)
 	{
-		if(y>27)
-		for (int i = 0; i < KHOANGCACH_Y; i++)
-		{
-			y--;
-			animation_set->at(0)->Render(x, y);
-		}
+		vy = -0.04f;
+		vx = 0;
 	}
-	
-}void CMarioSwitchMap::runDown()
+}
+
+
+void CMarioSwitchMap::runDown()
 {
-	if (x != 86)
+	if (x == 117 && y == 27)
 	{
-		if(y!=58)
-		for (int i = 0; i < KHOANGCACH_Y; i++)
-		{
-			y++;
-			animation_set->at(0)->Render(x, y);
-		}
+		vy = 0.04f;
+		vx = 0;
 	}
-	
 }
 
 void CMarioSwitchMap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	CGameObject::Update(dt);
+	x += dx;
+	y += dy;
+
+	if (vx > 0)
+	{
+		if (x >= 117)
+		{
+			x = 117;
+			vx = 0;
+		}
+	}
+	else
+	{
+		if (vx < 0)
+		{
+			if (x <= 86)
+			{
+				x = 86;
+				vx = 0;
+			}
+		}
+	}
+	if (vy > 0)
+	{
+		if (y >= 58)
+		{
+			y = 58;
+			vy = 0;
+		}
+	}
+	else
+	{
+		if (vy < 0)
+		{
+			if (y <= 27)
+			{
+				y = 27;
+				vy = 0;
+			}
+		}
+	}
+
+
 	if (x == 117 && y == 27)
 	{
 		first = true;

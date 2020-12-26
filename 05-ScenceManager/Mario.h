@@ -226,6 +226,10 @@ public:
 	{
 		marioScore+=100;
 	};
+	void LifeUp()
+	{
+		marioLife++;
+	};
 	double GetScore()
 	{
 		return marioScore;

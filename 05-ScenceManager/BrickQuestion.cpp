@@ -3,6 +3,7 @@
 #include "Scence.h"
 #include "Coin.h"
 #include "MushRoom.h"
+#include "Effect.h"
 #include "Leaf.h"
 #include <algorithm>
 CBrickQuestion::CBrickQuestion(int status)
@@ -88,12 +89,24 @@ void CBrickQuestion::Render()
 {
 	int ani = -1;
 
-	if (status_before)
+	if (status == BRICK_QUESTION_STATUS_EFFECT)
 	{
-			ani = BRICK_QUESTION_ANI_BEFORE;
+		if (status_before)
+		{
+			ani = 2;
+		}
+		else
+			ani = 3;
 	}
 	else
-		ani = BRICK_QUESTION_ANI_AFTER;
+	{
+		if (status_before)
+		{
+			ani = BRICK_QUESTION_ANI_BEFORE;
+		}
+		else
+			ani = BRICK_QUESTION_ANI_AFTER;
+	}
 	animation_set->at(ani)->Render(x, y);
 
 	/*RenderBoundingBox();*/
@@ -139,6 +152,25 @@ void CBrickQuestion::SetState(int state)
 			LPANIMATION_SET ani_set = animation_sets->Get(BRICK_QUESTION_ANI_MUSHROOM);
 			mushroom->SetAnimationSet(ani_set);
 			((CPlayScene*)scene)->addObject(mushroom);
+			break;
+		}
+		case BRICK_QUESTION_STATUS_MUSHROOM_GREEN:
+		{
+			CMushRoom* mushroom = new CMushRoom();
+			mushroom->green = true;
+			mushroom->x = x;
+			mushroom->y = y - MUSHROOM_BBOX_HEIGHT * BRICK_QUESTION_MUSHROOM;
+			mushroom->vx = -MUSHROOM_SPEED;
+			LPANIMATION_SET ani_set = animation_sets->Get(6023);
+			mushroom->SetAnimationSet(ani_set);
+			((CPlayScene*)scene)->addObject(mushroom);
+			break;
+		}
+		case BRICK_QUESTION_STATUS_EFFECT:
+		{
+			CEffect* effect = new CEffect();
+			effect->SetPosition(x,y-16);
+			((CPlayScene*)scene)->addObject(effect);
 			break;
 		}
 		default:

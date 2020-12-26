@@ -132,6 +132,7 @@
     <ClCompile Include="BrickQuestion.cpp" />
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="Drain.cpp" />
+    <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Fire.cpp" />
     <ClCompile Include="FireFlower.cpp" />
     <ClCompile Include="FlowerAttack.cpp" />
@@ -164,6 +165,7 @@
     <ClInclude Include="BrickQuestion.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="Drain.h" />
+    <ClInclude Include="Effect.h" />
     <ClInclude Include="Fire.h" />
     <ClInclude Include="FireFlower.h" />
     <ClInclude Include="FlowerAttack.h" />

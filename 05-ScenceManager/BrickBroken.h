@@ -7,16 +7,22 @@
 #define BRICK_BROKEN 111
 
 #define BRICK_BROKEN_STATE_HIDE 1
+#define BRICK_BROKEN_STATE_COIN 3
 #define BRICK_BROKEN_STATE_SHOW 2
+
+
+#define BRICK_BROKEN_STATUS_NORMAL 100
+#define BRICK_BROKEN_STATUS_COIN 200
 
 class CBrickBroken : public CGameObject
 {
+	int status;
 	int timeStart;
 public:
 	CBrickBroken();
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Render();
 	virtual void SetState(int state);
-
+	void BrokenAnimation();
 };
 

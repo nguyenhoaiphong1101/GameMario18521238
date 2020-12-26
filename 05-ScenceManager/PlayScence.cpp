@@ -71,6 +71,8 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_INTRO_TYPE_CURTAIN	23
 #define OBJECT_TYPE_MARIO_SWITCH_MAP	24
 #define OBJECT_TYPE_BRICK_BROKEN	25
+#define OBJECT_TYPE_BRICK_QUESTION_EFFECT	26
+#define OBJECT_TYPE_BRICK_QUESTION_SPECIAL_GREEN	27
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -317,6 +319,8 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_FLOWER_RED:	  obj = new CFlowerAttack(FLOWER_RED); break;
 	case OBJECT_TYPE_FLOWER_FIRE:	  obj = new CFireFlower(); break;
 	case OBJECT_TYPE_BRICK_QUESTION_SPECIAL:	  obj = new CBrickQuestion(BRICK_QUESTION_STATUS_SPECIAL); break;
+	case OBJECT_TYPE_BRICK_QUESTION_SPECIAL_GREEN:	  obj = new CBrickQuestion(BRICK_QUESTION_STATUS_MUSHROOM_GREEN); break;
+	case OBJECT_TYPE_BRICK_QUESTION_EFFECT:	  obj = new CBrickQuestion(BRICK_QUESTION_STATUS_EFFECT); break;
 	case OBJECT_TYPE_GOOMBAPARA:	  obj = new CGoombaPara(); break;
 	case OBJECT_TYPE_KOOPAPARA:	  obj = new CKoopaPara(); break;
 	case OBJECT_TYPE_FLOWER_GREEN:	  obj = new CFlowerAttack(FLOWER_GREEN); break;

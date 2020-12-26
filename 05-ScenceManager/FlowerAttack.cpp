@@ -9,29 +9,29 @@
 
 
 
-void CFlowerAttack::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
-{
-	for (UINT i = 0; i < coObjects->size(); i++)
-	{
-		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
-		if (dynamic_cast<CDrain*>(coObjects->at(i)))
-		{
-			continue;
-		}
-		if (dynamic_cast<CBox*>(coObjects->at(i)))
-		{
-			continue;
-		}
-		if (e->t > 0 && e->t <= 1.0f)
-		{
-			coEvents.push_back(e);
-		}
-		else
-			delete e;
-	}
-
-	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
-}
+//void CFlowerAttack::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
+//{
+//	for (UINT i = 0; i < coObjects->size(); i++)
+//	{
+//		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+//		if (dynamic_cast<CDrain*>(coObjects->at(i)))
+//		{
+//			continue;
+//		}
+//		if (dynamic_cast<CBox*>(coObjects->at(i)))
+//		{
+//			continue;
+//		}
+//		if (e->t > 0 && e->t <= 1.0f)
+//		{
+//			coEvents.push_back(e);
+//		}
+//		else
+//			delete e;
+//	}
+//
+//	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
+//}
 
 void CFlowerAttack::GetBoundingBox(float& l, float& t, float& r, float& b)
 {

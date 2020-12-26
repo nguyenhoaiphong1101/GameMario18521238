@@ -11,6 +11,7 @@
 #include "Portal.h"
 #include "Fire.h"
 #include "Brick.h"
+#include "Effect.h"
 #include "Drain.h"
 #include "Koopas.h"
 #include "Coin.h"
@@ -70,6 +71,16 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 		{
 			nx = 0;
 			ny = 0;
+		}
+
+		if (dynamic_cast<CBrickBroken*>(c->obj))
+		{
+			CBrickBroken* question = dynamic_cast<CBrickBroken*>(c->obj);
+			if (question->GetState() == BRICK_BROKEN_STATE_COIN)
+			{
+				if(c->ny!=0)
+				ny = 0;
+			}
 		}
 	}
 
@@ -173,7 +184,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				checkjumping = 0;
 				landingCheck = false;
 			}
-
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
@@ -371,8 +381,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 			}
-			
-
 			if (dynamic_cast<CCoin*>(e->obj))
 			{
 				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
@@ -392,9 +400,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CMushRoom*>(e->obj))
 			{
+				CMushRoom* mushroom = dynamic_cast<CMushRoom*>(e->obj);
 				if (level == MARIO_LEVEL_SMALL)
+				{
 					level = MARIO_LEVEL_BIG;
-				y -= MARIO_BIG_BBOX_HEIGHT;
+					y -= MARIO_BIG_BBOX_HEIGHT;
+				}
+				if (mushroom->green)
+				{
+					marioLife++;
+				}
 				e->obj->isDisAppear = true;
 			}
 			if (dynamic_cast<CBrickQuestion*>(e->obj))
@@ -450,7 +465,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CFlowerAttack*>(e->obj))
 			{
-
 				CFlowerAttack* flower = dynamic_cast<CFlowerAttack*>(e->obj);
 				if (level == MARIO_LEVEL_FOX && attack == true)
 				{
@@ -500,14 +514,48 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CBrickBroken*>(e->obj))
 			{
-				if (level == MARIO_LEVEL_FOX)
+				CBrickBroken* brick = dynamic_cast<CBrickBroken*>(e->obj);
+				if (brick->GetState() == BRICK_BROKEN_STATE_COIN)
 				{
-					if (attack == true)
+					brick->SetState(BRICK_BROKEN_STATE_HIDE);
+					marioCoin++;
+				}
+				else
+				{
+					if (level == MARIO_LEVEL_FOX)
 					{
-						CBrickBroken* brick = dynamic_cast<CBrickBroken*>(e->obj);
-						if (brick->GetState()== BRICK_BROKEN_STATE_SHOW)
+						if (attack == true)
 						{
-							brick->SetState(BRICK_BROKEN_STATE_HIDE);
+							if (brick->y >= (y + MARIO_FOX_BBOX_HEIGHT / 3) && brick->y <= (y + MARIO_FOX_BBOX_HEIGHT))
+							{
+								if (brick->GetState() == BRICK_BROKEN_STATE_SHOW)
+								{
+									brick->BrokenAnimation();
+									brick->SetState(BRICK_BROKEN_STATE_HIDE);
+									ScoreUp();
+								}
+							}
+						}
+					}
+				}
+			}
+			if (dynamic_cast<CEffect*>(e->obj))
+			{
+				CEffect* effect = dynamic_cast<CEffect*>(e->obj);
+				if (e->ny < 0)
+				{
+					if (effect->GetState() != EFFECT_P_STATE_AFTER)
+					{
+						effect->y += 9;
+						effect->SetState(EFFECT_P_STATE_AFTER);
+						for (UINT i = 0; i < coObjects->size(); i++)
+						{
+							if (dynamic_cast<CBrickBroken*>(coObjects->at(i)))
+							{
+								CBrickBroken* brick = dynamic_cast<CBrickBroken*>(coObjects->at(i));
+								if(brick->GetState()!= BRICK_BROKEN_STATE_HIDE)
+								brick->SetState(BRICK_BROKEN_STATE_COIN);
+							}
 						}
 					}
 				}
@@ -720,6 +768,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		cx = 2030;
 		cy = 266;
+	}
+	if (x > 2625)
+	{
+		cx = 2445;
 	}
 
 	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
