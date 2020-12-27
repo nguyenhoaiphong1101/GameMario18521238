@@ -13,12 +13,14 @@
 #include "Brick.h"
 #include "Effect.h"
 #include "Drain.h"
+#include "Card.h"
 #include "Koopas.h"
 #include "Coin.h"
 #include "BrickQuestion.h"
 #include "GoombaPara.h"
 #include "KoopaPara.h"
 #include "FireFlower.h"
+#include "NoCollision.h"
 #include "FlowerAttack.h"
 #include "BrickBroken.h"
 
@@ -91,7 +93,9 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	
 	CGameObject::Update(dt);
+	
 
 	// Simple fall down
 	if (flyCan == false && landingCheck == false && state != MARIO_STATE_DRAIN_1 && state != MARIO_STATE_DRAIN_2)
@@ -106,7 +110,19 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		CalcPotentialCollisions(coObjects, coEvents);
 	}
-
+	if (checkEnd == true)
+	{
+		nx = 1;
+		vx = 0.08f;
+		dx = vx * dt;
+	}
+	if (x > 2815)
+	{
+		CGame::GetInstance()->SetCamPos((int)0, (int)0);
+		CPortal* p = new CPortal(2);
+		CGame::GetInstance()->SwitchScene(p->GetSceneId());
+		return;
+	}
 	// Calculate dx, dy 
 
 
@@ -123,10 +139,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Reset();
 	}
 
-
-
-
-
+	
 	// turn off collision when die 
 
 
@@ -153,7 +166,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				dy = vy * dt;
 			}
 		}
-
+		
 		x += dx;
 		y += dy;
 		checkFree = true;
@@ -443,7 +456,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CFireFlower*>(e->obj))
 			{
 				CFireFlower* fire = dynamic_cast<CFireFlower*>(e->obj);
-				fire->isDisAppear = true;
+				fire->SetState(FIRE_FLOWER_STATE_HIDE);
 				if (untouchable == 0)
 				{
 					if (level == MARIO_LEVEL_FIRE || level == MARIO_LEVEL_FOX)
@@ -558,6 +571,52 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							}
 						}
 					}
+				}
+			}
+			if (dynamic_cast<CCard*>(e->obj))
+			{
+				CCard* CCCard = dynamic_cast<CCard*>(e->obj);
+				card = CCCard->GetState();
+				CCCard->SetState(CARD_STATE_HIDE);
+				checkEnd = true;
+				LPSCENE scene = CGame::GetInstance()->GetCurrentScene();
+				CAnimationSets* animation_sets = CAnimationSets::GetInstance();
+				CNoCollision* content = new CNoCollision();
+				content->SetPosition(2580, -20);
+				LPANIMATION_SET content_ani = animation_sets->Get(5030);
+				content->SetAnimationSet(content_ani);
+				((CPlayScene*)scene)->addObject(content);
+				switch (card)
+				{
+				case 1:
+				{
+					CNoCollision* item = new CNoCollision();
+					item->SetPosition(2753, 24);
+					LPANIMATION_SET item_ani = animation_sets->Get(5031);
+					item->SetAnimationSet(item_ani);
+					((CPlayScene*)scene)->addObject(item);
+					break;
+				}
+				case 2:
+				{
+					CNoCollision* item = new CNoCollision();
+					item->SetPosition(2753, 24);
+					LPANIMATION_SET item_ani = animation_sets->Get(5032);
+					item->SetAnimationSet(item_ani);
+					((CPlayScene*)scene)->addObject(item);
+					break;
+				}
+				case 3:
+				{
+					CNoCollision* item = new CNoCollision();
+					item->SetPosition(2753, 24);
+					LPANIMATION_SET item_ani = animation_sets->Get(5033);
+					item->SetAnimationSet(item_ani);
+					((CPlayScene*)scene)->addObject(item);
+					break;
+				}
+				default:
+					break;
 				}
 			}
 			if (dynamic_cast<CKoopaPara*>(e->obj))
@@ -748,6 +807,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			attackCheck = 0;
 		}
 	}
+	
 
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
@@ -772,6 +832,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (x > 2625)
 	{
 		cx = 2445;
+		cy = -10;
 	}
 
 	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
@@ -1341,6 +1402,9 @@ void CMario::SetState(int state)
 	case MARIO_STATE_DRAIN_2:
 		timeDrain = GetTickCount();
 		vx = 0;
+		break;
+	case MARIO_STATE_END:
+		vx = 0.04f;
 		break;
 	}
 }

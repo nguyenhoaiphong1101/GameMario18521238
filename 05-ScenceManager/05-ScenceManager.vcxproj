@@ -130,6 +130,7 @@
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="BrickBroken.cpp" />
     <ClCompile Include="BrickQuestion.cpp" />
+    <ClCompile Include="Card.cpp" />
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="Drain.cpp" />
     <ClCompile Include="Effect.cpp" />
@@ -163,6 +164,7 @@
     <ClInclude Include="Brick.h" />
     <ClInclude Include="BrickBroken.h" />
     <ClInclude Include="BrickQuestion.h" />
+    <ClInclude Include="Card.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="Drain.h" />
     <ClInclude Include="Effect.h" />

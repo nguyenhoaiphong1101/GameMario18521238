@@ -4,7 +4,7 @@ void CMarioSwitchMap::runLeft()
 {
 	if (x == 117 && y == 58)
 	{
-		vx = -0.04f;
+		vx = -0.08f;
 		vy = 0;
 	}
 }
@@ -12,7 +12,7 @@ void CMarioSwitchMap::runRight()
 {
 	if (x == 86 && y == 58)
 	{
-		vx = 0.04f;
+		vx = 0.08f;
 		vy = 0;
 	}
 }
@@ -20,7 +20,7 @@ void CMarioSwitchMap::runUp()
 {
 	if (x == 117 && y == 58)
 	{
-		vy = -0.04f;
+		vy = -0.08f;
 		vx = 0;
 	}
 }
@@ -30,7 +30,7 @@ void CMarioSwitchMap::runDown()
 {
 	if (x == 117 && y == 27)
 	{
-		vy = 0.04f;
+		vy = 0.08f;
 		vx = 0;
 	}
 }

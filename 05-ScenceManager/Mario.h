@@ -32,6 +32,7 @@
 #define MARIO_STATE_LANDING				502
 #define MARIO_STATE_DRAIN_1			503
 #define MARIO_STATE_DRAIN_2			504
+#define MARIO_STATE_END			505
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -186,6 +187,9 @@ public:
 	int timeFly = 0;	//kiểm tra thời gian bay
 	bool landingCheck = false;	//kiểm tra hạ cánh
 	bool checkFree = false;	
+	bool checkEnd = false;	
+	int card = 0;
+	DWORD timeEnd = 0;
 	DWORD attackCheck = 0;
 
 	CMario(float x = 0.0f, float y = 0.0f);

@@ -16,6 +16,7 @@
 #include "FlowerAttack.h"
 #include "GoombaPara.h"
 #include "KoopaPara.h"
+#include "Card.h"
 #include "IntroMario.h"
 #include "FireFlower.h"
 #include "MarioSwitchMap.h"
@@ -73,6 +74,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_BRICK_BROKEN	25
 #define OBJECT_TYPE_BRICK_QUESTION_EFFECT	26
 #define OBJECT_TYPE_BRICK_QUESTION_SPECIAL_GREEN	27
+#define OBJECT_TYPE_CARD	28
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -334,6 +336,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_INTRO_TYPE_CURTAIN:	  obj = new CIntroMario(INTRO_TYPE_CURTAIN); break;
 	case OBJECT_TYPE_MARIO_SWITCH_MAP:	  obj = new CMarioSwitchMap(); break;
 	case OBJECT_TYPE_BRICK_BROKEN:	  obj = new CBrickBroken(); break;
+	case OBJECT_TYPE_CARD:	  obj = new CCard(); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
@@ -518,7 +521,7 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	if (mario != NULL)
 	{
-		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2 && mario->checkEnd == false && mario->GetState() != MARIO_STATE_DIE)
 		{
 			switch (KeyCode)
 			{
@@ -629,7 +632,7 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	if (mario != NULL)
 	{
-		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2&& mario->GetState() != MARIO_STATE_DIE&&mario->checkEnd==false)
 		{
 			switch (KeyCode)
 			{
