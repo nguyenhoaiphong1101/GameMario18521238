@@ -168,6 +168,7 @@ class CMario : public CGameObject
 	int levelFly = 0;
 	DWORD timeKoopas = 0;
 	DWORD timeDrain = 0;
+	float camX_update = 0;
 	
 
 
@@ -191,6 +192,7 @@ public:
 	int card = 0;
 	DWORD timeEnd = 0;
 	DWORD attackCheck = 0;
+	bool checkRecMove = false;
 
 	CMario(float x = 0.0f, float y = 0.0f);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* colliable_objects = NULL);

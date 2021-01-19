@@ -1,7 +1,10 @@
 #include "Brick.h"
+#include "Game.h"
 
 void CBrick::Render()
 {
+	int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
+	if(ids!=4)
 	animation_set->at(0)->Render(x, y);
 	//RenderBoundingBox();
 }

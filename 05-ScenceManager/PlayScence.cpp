@@ -21,6 +21,7 @@
 #include "FireFlower.h"
 #include "MarioSwitchMap.h"
 #include "BrickBroken.h"
+#include "RectangleMove.h"
 
 
 
@@ -45,6 +46,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define SCENE_SECTION_ANIMATIONS 4
 #define SCENE_SECTION_ANIMATION_SETS	5
 #define SCENE_SECTION_OBJECTS	6
+#define SCENE_SECTION_MAP				7
 
 #define OBJECT_TYPE_MARIO	0
 #define OBJECT_TYPE_BRICK	1
@@ -75,6 +77,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_BRICK_QUESTION_EFFECT	26
 #define OBJECT_TYPE_BRICK_QUESTION_SPECIAL_GREEN	27
 #define OBJECT_TYPE_CARD	28
+#define OBJECT_TYPE_RETANGLE_MOVE	29
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -110,7 +113,7 @@ void CPlayScene::ChoosePlayer()
 			{
 				if (intro->getFirst())
 				{
-					CPortal* p =new CPortal(2);
+					CPortal* p = new CPortal(2);
 					CGame::GetInstance()->SwitchScene(p->GetSceneId());
 				}
 			}
@@ -129,7 +132,7 @@ void CPlayScene::ChooseMap()
 			{
 				if (marioSW->getFirst())
 				{
-					CPortal* p =new CPortal(3);
+					CPortal* p = new CPortal(3);
 					CGame::GetInstance()->SwitchScene(p->GetSceneId());
 				}
 			}
@@ -144,8 +147,8 @@ void CPlayScene::runLeft()
 		LPGAMEOBJECT obj = objects[i];
 		if (dynamic_cast<CMarioSwitchMap*>(obj))
 		{
-			CMarioSwitchMap* marioSM= dynamic_cast<CMarioSwitchMap*>(obj);
-				marioSM->runLeft();
+			CMarioSwitchMap* marioSM = dynamic_cast<CMarioSwitchMap*>(obj);
+			marioSM->runLeft();
 		}
 	}
 }
@@ -173,8 +176,8 @@ void CPlayScene::runDown()
 		if (dynamic_cast<CMarioSwitchMap*>(obj))
 		{
 			CMarioSwitchMap* marioSM = dynamic_cast<CMarioSwitchMap*>(obj);
-			
-				marioSM->runDown();
+
+			marioSM->runDown();
 		}
 	}
 }
@@ -337,6 +340,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_MARIO_SWITCH_MAP:	  obj = new CMarioSwitchMap(); break;
 	case OBJECT_TYPE_BRICK_BROKEN:	  obj = new CBrickBroken(); break;
 	case OBJECT_TYPE_CARD:	  obj = new CCard(); break;
+	case OBJECT_TYPE_RETANGLE_MOVE:	  obj = new CRectangleMove(); break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
@@ -360,6 +364,25 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	objects.push_back(obj);
 }
 
+void CPlayScene::_ParseSection_MAP(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 7) return; // skip invalid lines
+
+	int idTileSet = atoi(tokens[0].c_str());
+	int totalRowsTileSet = atoi(tokens[1].c_str());
+	int totalColumnsTileSet = atoi(tokens[2].c_str());
+	int totalRowsMap = atoi(tokens[3].c_str());
+	int totalColumnsMap = atoi(tokens[4].c_str());
+	int totalTiles = atoi(tokens[5].c_str());
+	wstring file_path = ToWSTR(tokens[6]);
+
+	map = new Map(idTileSet, totalRowsTileSet, totalColumnsTileSet, totalRowsMap, totalColumnsMap, totalTiles);
+	map->LoadMap(file_path.c_str());
+	map->ExtractTileFromTileSet();
+}
+
 void CPlayScene::Load()
 {
 	DebugOut(L"[INFO] Start loading scene resources from : %s \n", sceneFilePath);
@@ -378,6 +401,7 @@ void CPlayScene::Load()
 		if (line[0] == '#') continue;	// skip comment lines	
 
 		if (line == "[TEXTURES]") { section = SCENE_SECTION_TEXTURES; continue; }
+		if (line == "[MAP]") { section = SCENE_SECTION_MAP; continue; }
 		if (line == "[SPRITES]") {
 			section = SCENE_SECTION_SPRITES; continue;
 		}
@@ -398,6 +422,7 @@ void CPlayScene::Load()
 		switch (section)
 		{
 		case SCENE_SECTION_TEXTURES: _ParseSection_TEXTURES(line); break;
+		case SCENE_SECTION_MAP: _ParseSection_MAP(line); break;
 		case SCENE_SECTION_SPRITES: _ParseSection_SPRITES(line); break;
 		case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
 		case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
@@ -417,30 +442,30 @@ void CPlayScene::Update(DWORD dt)
 	// We know that Mario is the first object in the list hence we won't add him into the colliable object list
 	// TO-DO: This is a "dirty" way, need a more organized way
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
-	if(player!=NULL)
-	if (player->GetState() == MARIO_STATE_SHOOT_FIRE)
-	{
-		CGameObject* obj = NULL;
-		obj = new CFire();
-		if (player->nx == 1)
+	if (player != NULL)
+		if (player->GetState() == MARIO_STATE_SHOOT_FIRE)
 		{
-			obj->SetPosition(player->x + MARIO_FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
-			obj->vx = FIRE_SPEED;
-			obj->nx = 1;
+			CGameObject* obj = NULL;
+			obj = new CFire();
+			if (player->nx == 1)
+			{
+				obj->SetPosition(player->x + MARIO_FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
+				obj->vx = FIRE_SPEED;
+				obj->nx = 1;
 
+			}
+			else
+			{
+				obj->SetPosition(player->x - FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
+				obj->vx = -FIRE_SPEED;
+				obj->nx = -1;
+
+			}
+
+			LPANIMATION_SET ani_set = animation_sets->Get(OBJECT_ANI_SET_FIRE);
+			obj->SetAnimationSet(ani_set);
+			objects.push_back(obj);
 		}
-		else
-		{
-			obj->SetPosition(player->x - FIRE_BBOX_WIDTH, player->y + (MARIO_FIRE_BBOX_HEIGHT - FIRE_BBOX_WIDTH) / 4);
-			obj->vx = -FIRE_SPEED;
-			obj->nx = -1;
-
-		}
-
-		LPANIMATION_SET ani_set = animation_sets->Get(OBJECT_ANI_SET_FIRE);
-		obj->SetAnimationSet(ani_set);
-		objects.push_back(obj);
-	}
 
 
 
@@ -465,21 +490,33 @@ void CPlayScene::Update(DWORD dt)
 		{
 			if (player != NULL)
 			{
-				if (obj->x <= player->x + game->GetScreenWidth())
+				int id = CGame::GetInstance()->GetCurrentScene()->GetId();
+				if (id == 4)
 				{
-					if (dynamic_cast<CHUD*>(obj))
+					if (obj->x <= CGame::GetInstance()->GetCamPosX()+400)
 					{
 						objects[i]->Update(dt, &coObjects);
-					}else if(obj->y>=player->y-game->GetScreenHeight()&& obj->y <= player->y + game->GetScreenHeight())
-					objects[i]->Update(dt, &coObjects);
+					}
+				}
+				else
+				{
+					if (obj->x <= player->x + game->GetScreenWidth())
+					{
+						if (dynamic_cast<CHUD*>(obj))
+						{
+							objects[i]->Update(dt, &coObjects);
+						}
+						else if (obj->y >= player->y - game->GetScreenHeight() && obj->y <= player->y + game->GetScreenHeight())
+							objects[i]->Update(dt, &coObjects);
+					}
 				}
 			}
 			else
-			objects[i]->Update(dt, &coObjects);
+				objects[i]->Update(dt, &coObjects);
 		}
-		
-	}
 
+	}
+	//CGame::GetInstance()->SetCamPos((int)0, (int)220);
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
 
@@ -487,10 +524,17 @@ void CPlayScene::Update(DWORD dt)
 
 	// Update camera to follow mario
 
+
 }
 
 void CPlayScene::Render()
 {
+
+	if (map)
+	{
+		this->map->Render();
+	}
+
 	for (int i = 0; i < objects.size(); i++)
 	{
 		objects[i]->Render();
@@ -544,11 +588,12 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 					}
 
 				}
-				break;
-			case DIK_SPACE:
-				if (mario->GetLevel() == MARIO_LEVEL_FOX)
+				else
 				{
-					mario->landingCheck = true;
+					if (mario->GetLevel() == MARIO_LEVEL_FOX)
+					{
+						mario->landingCheck = true;
+					}
 				}
 				break;
 			case DIK_R:
@@ -596,8 +641,8 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 			((CPlayScene*)scence)->runLeft();
 			break;
 		}
-		
-			
+
+
 		case DIK_UP:
 		{
 			((CPlayScene*)scence)->runUp();
@@ -620,8 +665,8 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 			break;
 		}
 	}
-	
-	
+
+
 }
 
 void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
@@ -632,7 +677,7 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	if (mario != NULL)
 	{
-		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2&& mario->GetState() != MARIO_STATE_DIE&&mario->checkEnd==false)
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2 && mario->GetState() != MARIO_STATE_DIE && mario->checkEnd == false)
 		{
 			switch (KeyCode)
 			{
@@ -671,8 +716,8 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 			}
 		}
 	}
-	
-	
+
+
 }
 
 void CPlayScenceKeyHandler::KeyState(BYTE* states)
@@ -731,7 +776,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 				mario->SetState(MARIO_STATE_IDLE);
 		}
 	}
-	
-	
+
+
 }
 

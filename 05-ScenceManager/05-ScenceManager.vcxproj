@@ -143,10 +143,12 @@
     <ClCompile Include="KoopaPara.cpp" />
     <ClCompile Include="Koopas.cpp" />
     <ClCompile Include="Leaf.cpp" />
+    <ClCompile Include="Map.cpp" />
     <ClCompile Include="MarioSwitchMap.cpp" />
     <ClCompile Include="MushRoom.cpp" />
     <ClCompile Include="NoCollision.cpp" />
     <ClCompile Include="Portal.cpp" />
+    <ClCompile Include="RectangleMove.cpp" />
     <ClCompile Include="Utils.cpp" />
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="GameObject.cpp" />
@@ -177,10 +179,12 @@
     <ClInclude Include="KoopaPara.h" />
     <ClInclude Include="Koopas.h" />
     <ClInclude Include="Leaf.h" />
+    <ClInclude Include="Map.h" />
     <ClInclude Include="MarioSwitchMap.h" />
     <ClInclude Include="MushRoom.h" />
     <ClInclude Include="NoCollision.h" />
     <ClInclude Include="Portal.h" />
+    <ClInclude Include="RectangleMove.h" />
     <ClInclude Include="Utils.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="GameObject.h" />

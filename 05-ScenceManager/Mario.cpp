@@ -23,6 +23,7 @@
 #include "NoCollision.h"
 #include "FlowerAttack.h"
 #include "BrickBroken.h"
+#include "RectangleMove.h"
 
 CMario::CMario(float x, float y) : CGameObject()
 {
@@ -61,7 +62,7 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 		}
 		if (dynamic_cast<CCoin*>(c->obj))
 		{
-			nx = 0;
+			//nx = 0;
 			ny = 0;
 		}
 		if (dynamic_cast<CMushRoom*>(c->obj))
@@ -80,8 +81,8 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 			CBrickBroken* question = dynamic_cast<CBrickBroken*>(c->obj);
 			if (question->GetState() == BRICK_BROKEN_STATE_COIN)
 			{
-				if(c->ny!=0)
-				ny = 0;
+				if (c->ny != 0)
+					ny = 0;
 			}
 		}
 	}
@@ -93,9 +94,10 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 
 void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-	
+
+	checkRecMove = false;
 	CGameObject::Update(dt);
-	
+
 
 	// Simple fall down
 	if (flyCan == false && landingCheck == false && state != MARIO_STATE_DRAIN_1 && state != MARIO_STATE_DRAIN_2)
@@ -139,7 +141,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		Reset();
 	}
 
-	
+
 	// turn off collision when die 
 
 
@@ -166,7 +168,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				dy = vy * dt;
 			}
 		}
-		
+
 		x += dx;
 		y += dy;
 		checkFree = true;
@@ -394,6 +396,16 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					}
 				}
 			}
+			if (dynamic_cast<CRectangleMove*>(e->obj))
+			{
+				CRectangleMove* Rec = dynamic_cast<CRectangleMove*>(e->obj);
+				if (e->ny < 0)
+				{
+					Rec->SetState(RECTANGLE_MOVE_STATE_DOWN);
+					Rec->mario_check = true;
+					checkRecMove = true;
+				}
+			}
 			if (dynamic_cast<CCoin*>(e->obj))
 			{
 				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
@@ -566,8 +578,8 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							if (dynamic_cast<CBrickBroken*>(coObjects->at(i)))
 							{
 								CBrickBroken* brick = dynamic_cast<CBrickBroken*>(coObjects->at(i));
-								if(brick->GetState()!= BRICK_BROKEN_STATE_HIDE)
-								brick->SetState(BRICK_BROKEN_STATE_COIN);
+								if (brick->GetState() != BRICK_BROKEN_STATE_HIDE)
+									brick->SetState(BRICK_BROKEN_STATE_COIN);
 							}
 						}
 					}
@@ -807,7 +819,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			attackCheck = 0;
 		}
 	}
-	
+
 
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
@@ -823,6 +835,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (y >= -46)
 		cy = -10;
 
+
 	else cy -= game->GetScreenHeight() / 2;
 	if (y > 250)
 	{
@@ -835,8 +848,21 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		cy = -10;
 	}
 
-	CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
 
+	int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
+	if (ids == 4)
+	{
+		camX_update += 0.04f * dt;
+		CGame::GetInstance()->SetCamPos((int)camX_update, (int)220);
+	}
+	else
+	{
+		CGame::GetInstance()->SetCamPos((int)cx, (int)cy);
+	}
+	if (x < camX_update)
+	{
+		x = camX_update;
+	}
 }
 
 void CMario::Render()

@@ -5,10 +5,10 @@
 #define MUSHROOM_BBOX_HEIGHT  16
 
 #define MUSHROOM_ANI_RIGHT  0
-#define MUSHROOM_ANI_LEFT  1
+#define MUSHROOM_ANI_LEFT  1  
 
 #define MUSHROOM_GRAVITY 0.0002f
-#define MUSHROOM_SPEED 0.05f
+#define MUSHROOM_SPEED 0.04f
 
 class CMushRoom : public CGameObject
 {
