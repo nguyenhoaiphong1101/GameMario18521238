@@ -49,6 +49,9 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 
 	coEventsResult.clear();
 
+	bool check_rec = false;
+	bool check_brickbroken = false;
+
 	for (UINT i = 0; i < coEvents.size(); i++)
 	{
 		LPCOLLISIONEVENT c = coEvents[i];
@@ -70,14 +73,31 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 			nx = 0;
 			ny = 0;
 		}
+
 		if (dynamic_cast<CKoopaPara*>(c->obj))
 		{
 			nx = 0;
 			ny = 0;
 		}
-
+		if (dynamic_cast<CRectangleMove*>(c->obj))
+		{
+			if (c->ny < 0)
+			{
+				check_rec = true;
+				if (!check_brickbroken)
+				{
+					ny = 0;
+				}
+			}
+		}
 		if (dynamic_cast<CBrickBroken*>(c->obj))
 		{
+			check_brickbroken = true;
+			if (check_rec == true)
+			{
+				ny = c->ny;
+				break;
+			}
 			CBrickBroken* question = dynamic_cast<CBrickBroken*>(c->obj);
 			if (question->GetState() == BRICK_BROKEN_STATE_COIN)
 			{
@@ -85,6 +105,7 @@ void CMario::FilterCollision(vector<LPCOLLISIONEVENT>& coEvents, vector<LPCOLLIS
 					ny = 0;
 			}
 		}
+
 	}
 
 	if (min_ix >= 0) coEventsResult.push_back(coEvents[min_ix]);
@@ -406,12 +427,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					checkRecMove = true;
 				}
 			}
-			if (dynamic_cast<CCoin*>(e->obj))
-			{
-				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
-				coin->SetShow(false);
-				marioCoin++;
-			}
 			if (dynamic_cast<CDrain*>(e->obj))
 			{
 				if (e->ny < 0)
@@ -453,7 +468,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							{
 								brickQuestion->SetStatus(BRICK_QUESTION_STATUS_MUSHROOM);
 							}
-							else if (level == MARIO_LEVEL_BIG)
+							else if (level == MARIO_LEVEL_BIG || level == MARIO_LEVEL_FOX)
 							{
 								brickQuestion->SetStatus(BRICK_QUESTION_STATUS_LEAF);
 							}
@@ -462,8 +477,22 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 						marioCoin++;
 						marioScore += MARIO_SCORE;
 					}
-				}
 
+				}
+				if (e->nx != 0)
+				{
+					if (level == MARIO_LEVEL_FOX && attack == true)
+					{
+						CBrickQuestion* brickQuestion = dynamic_cast<CBrickQuestion*>(e->obj);
+						if (brickQuestion->GetBefore())
+						{
+							brickQuestion->SetBefore(false);
+							brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
+							marioCoin++;
+							marioScore += MARIO_SCORE;
+						}
+					}
+				}
 			}
 			if (dynamic_cast<CFireFlower*>(e->obj))
 			{
@@ -551,14 +580,29 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					{
 						if (attack == true)
 						{
-							if (brick->y >= (y + MARIO_FOX_BBOX_HEIGHT / 3) && brick->y <= (y + MARIO_FOX_BBOX_HEIGHT))
+							if (e->nx != 0)
 							{
-								if (brick->GetState() == BRICK_BROKEN_STATE_SHOW)
+								if (brick->y >= (y + MARIO_FOX_BBOX_HEIGHT / 3) && brick->y <= (y + MARIO_FOX_BBOX_HEIGHT))
 								{
-									brick->BrokenAnimation();
-									brick->SetState(BRICK_BROKEN_STATE_HIDE);
-									ScoreUp();
+									if (brick->GetState() == BRICK_BROKEN_STATE_SHOW)
+									{
+										brick->BrokenAnimation();
+										brick->SetState(BRICK_BROKEN_STATE_HIDE);
+										ScoreUp();
+									}
 								}
+							}
+						}
+					}
+					if (level != MARIO_LEVEL_SMALL)
+					{
+						if (e->ny > 0)
+						{
+							if (brick->GetState() == BRICK_BROKEN_STATE_SHOW)
+							{
+								brick->BrokenAnimation();
+								brick->SetState(BRICK_BROKEN_STATE_HIDE);
+								ScoreUp();
 							}
 						}
 					}
@@ -732,6 +776,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 								}
 							}
 						}
+			}
+			if (dynamic_cast<CCoin*>(e->obj))
+			{
+				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
+				coin->SetShow(false);
+				marioCoin++;
 			}
 			if (dynamic_cast<CPortal*>(e->obj))
 			{

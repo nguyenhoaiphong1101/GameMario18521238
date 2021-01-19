@@ -42,6 +42,8 @@ void CRectangleMove::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
 	CGameObject::Update(dt);
 
+	mario_check = false;
+
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
 
@@ -51,33 +53,15 @@ void CRectangleMove::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	CMario* mario = ((CPlayScene*)CGame::GetInstance()->GetCurrentScene())->GetPlayer();
 
-	
-
-
-
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
 	{
 		x += dx;
 		y += dy;
 	}
-	else
-	{
+	
+	
 
-		float min_tx, min_ty, nx = 0, ny;
-		float rdx = 0;
-		float rdy = 0;
-
-		FilterCollision(coEvents, coEventsResult, min_tx, min_ty, nx, ny, rdx, rdy);
-
-		
-
-		for (UINT i = 0; i < coEventsResult.size(); i++)
-		{
-			LPCOLLISIONEVENT e = coEventsResult[i];
-			
-		}
-	}
 	
 	if (mario->checkRecMove)
 	{
@@ -93,9 +77,9 @@ void CRectangleMove::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 		}
 	}
-
+	
+	
 	// clean up collision events
-	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
 }
 

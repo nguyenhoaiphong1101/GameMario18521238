@@ -23,7 +23,10 @@ void CBrickQuestion::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CBrickQuestion::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+
 	CGameObject::Update(dt);
+
+
 
 	vector<LPCOLLISIONEVENT> coEvents;
 	vector<LPCOLLISIONEVENT> coEventsResult;
@@ -50,12 +53,11 @@ void CBrickQuestion::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 		else
 		{
-			if(timeAni<= BRICK_QUESTION_COUNT_TIME)
+			if (timeAni <= BRICK_QUESTION_COUNT_TIME)
 			{
 				y += BRICK_QUESTION_COUNT_Y;
 				timeAni++;
 			}
-				
 		}
 	}
 
@@ -83,13 +85,15 @@ void CBrickQuestion::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// clean up collision events
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 
+
 }
 
 void CBrickQuestion::Render()
 {
 	int ani = -1;
 
-	if (status == BRICK_QUESTION_STATUS_EFFECT)
+	int id = CGame::GetInstance()->GetCurrentScene()->GetId();
+	if (id == 4)
 	{
 		if (status_before)
 		{
@@ -100,13 +104,27 @@ void CBrickQuestion::Render()
 	}
 	else
 	{
-		if (status_before)
+		if (status == BRICK_QUESTION_STATUS_EFFECT)
 		{
-			ani = BRICK_QUESTION_ANI_BEFORE;
+			if (status_before)
+			{
+				ani = 2;
+			}
+			else
+				ani = 3;
 		}
 		else
-			ani = BRICK_QUESTION_ANI_AFTER;
+		{
+			if (status_before)
+			{
+				ani = BRICK_QUESTION_ANI_BEFORE;
+			}
+			else
+				ani = BRICK_QUESTION_ANI_AFTER;
+		}
 	}
+
+
 	animation_set->at(ani)->Render(x, y);
 
 	/*RenderBoundingBox();*/
@@ -123,9 +141,9 @@ void CBrickQuestion::SetState(int state)
 		{
 		case BRICK_QUESTION_STATUS_COIN:
 		{
-			CCoin *coins = new CCoin(COIN);
+			CCoin* coins = new CCoin(COIN);
 			coins->SetState(COIN_STATE_UP);
-			coins->x = x+ BRICK_QUESTION_BBOX_WIDTH/4;
+			coins->x = x + BRICK_QUESTION_BBOX_WIDTH / 4;
 			coins->y = y - COIN_BBOX_HEIGHT;
 			LPANIMATION_SET ani_set = animation_sets->Get(BRICK_QUESTION_ANI_COIN);
 			coins->SetAnimationSet(ani_set);
@@ -141,7 +159,7 @@ void CBrickQuestion::SetState(int state)
 			leaf->SetAnimationSet(ani_set);
 			((CPlayScene*)scene)->addObject(leaf);
 			break;
-			
+
 		}
 		case BRICK_QUESTION_STATUS_MUSHROOM:
 		{
@@ -169,7 +187,7 @@ void CBrickQuestion::SetState(int state)
 		case BRICK_QUESTION_STATUS_EFFECT:
 		{
 			CEffect* effect = new CEffect();
-			effect->SetPosition(x,y-16);
+			effect->SetPosition(x, y - 16);
 			((CPlayScene*)scene)->addObject(effect);
 			break;
 		}
