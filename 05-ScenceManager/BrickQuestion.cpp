@@ -12,6 +12,25 @@ CBrickQuestion::CBrickQuestion(int status)
 	state = -1;
 }
 
+void CBrickQuestion::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
+{
+
+	for (UINT i = 0; i < coObjects->size(); i++)
+	{
+		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+		if (dynamic_cast<CCoin*>(coObjects->at(i)))
+		{
+			continue;
+		}
+
+		if (e->t > 0 && e->t <= 1.0f)
+			coEvents.push_back(e);
+		else
+			delete e;
+	}
+	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
+}
+
 
 void CBrickQuestion::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
@@ -57,6 +76,20 @@ void CBrickQuestion::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				y += BRICK_QUESTION_COUNT_Y;
 				timeAni++;
+			}
+			else
+			{
+				int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
+				if(ids==4 && times!=0)
+				{
+					timeAni = 0;
+					check == false;
+					status_after = false;
+				}
+				else
+				{
+					status_before = false;
+				}
 			}
 		}
 	}
@@ -182,6 +215,19 @@ void CBrickQuestion::SetState(int state)
 			LPANIMATION_SET ani_set = animation_sets->Get(6023);
 			mushroom->SetAnimationSet(ani_set);
 			((CPlayScene*)scene)->addObject(mushroom);
+			int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
+			if (ids == 4)
+			{
+				if (x > mario->x)
+				{
+					mushroom->vx = -MUSHROOM_SPEED;
+				}
+				else
+				{
+					mushroom->vx = MUSHROOM_SPEED;
+				}
+				mushroom->y = y - MUSHROOM_BBOX_HEIGHT * 2;
+			}
 			break;
 		}
 		case BRICK_QUESTION_STATUS_EFFECT:

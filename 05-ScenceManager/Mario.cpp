@@ -1,10 +1,8 @@
 ﻿#include <algorithm>
 #include <assert.h>
 #include "Utils.h"
-
 #include "Mario.h"
 #include "Game.h"
-
 #include "Goomba.h"
 #include "MushRoom.h"
 #include "Box.h"
@@ -457,26 +455,73 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (e->ny > 0)
 				{
 					CBrickQuestion* brickQuestion = dynamic_cast<CBrickQuestion*>(e->obj);
-					if (brickQuestion->GetBefore())
+					int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
+					if (ids == 4)
 					{
-						brickQuestion->SetUp(true);
-						brickQuestion->SetBefore(false);
-						brickQuestion->SetAfter(true);
-						if (brickQuestion->GetStatus() == BRICK_QUESTION_STATUS_SPECIAL)
+						if (brickQuestion->GetBefore())
 						{
-							if (level == MARIO_LEVEL_SMALL)
+							if (brickQuestion->GetStatus() == BRICK_QUESTION_STATUS_SPECIAL)
 							{
-								brickQuestion->SetStatus(BRICK_QUESTION_STATUS_MUSHROOM);
+								brickQuestion->SetUp(true);
+								brickQuestion->SetBefore(false);
+								brickQuestion->SetAfter(true);
+								if (level == MARIO_LEVEL_SMALL)
+								{
+									brickQuestion->SetStatus(BRICK_QUESTION_STATUS_MUSHROOM);
+								}
+								else if (level == MARIO_LEVEL_BIG || level == MARIO_LEVEL_FOX)
+								{
+									brickQuestion->SetStatus(BRICK_QUESTION_STATUS_LEAF);
+								}
+								brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
+								marioCoin++;
+								marioScore += MARIO_SCORE;
 							}
-							else if (level == MARIO_LEVEL_BIG || level == MARIO_LEVEL_FOX)
+							else if (brickQuestion->GetStatus() == BRICK_QUESTION_STATUS_MUSHROOM_GREEN)
 							{
-								brickQuestion->SetStatus(BRICK_QUESTION_STATUS_LEAF);
+								brickQuestion->SetUp(true);
+								brickQuestion->SetBefore(false);
+								brickQuestion->SetAfter(true);
+								brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
+								marioCoin++;
+								marioScore += MARIO_SCORE;
 							}
+							else if (brickQuestion->times > 0)
+							{
+								brickQuestion->SetAfter(true);
+								brickQuestion->SetUp(true);
+								brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
+								brickQuestion->times--;
+								marioCoin++;
+								marioScore += MARIO_SCORE;
+							}
+							
 						}
-						brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
-						marioCoin++;
-						marioScore += MARIO_SCORE;
 					}
+					else
+					{
+						if (brickQuestion->GetBefore())
+						{
+							brickQuestion->SetUp(true);
+							brickQuestion->SetBefore(false);
+							brickQuestion->SetAfter(true);
+							if (brickQuestion->GetStatus() == BRICK_QUESTION_STATUS_SPECIAL)
+							{
+								if (level == MARIO_LEVEL_SMALL)
+								{
+									brickQuestion->SetStatus(BRICK_QUESTION_STATUS_MUSHROOM);
+								}
+								else if (level == MARIO_LEVEL_BIG || level == MARIO_LEVEL_FOX)
+								{
+									brickQuestion->SetStatus(BRICK_QUESTION_STATUS_LEAF);
+								}
+							}
+							brickQuestion->SetState(BRICK_QUESTION_STATE_AFTER);
+							marioCoin++;
+							marioScore += MARIO_SCORE;
+						}
+					}
+
 
 				}
 				if (e->nx != 0)
@@ -780,7 +825,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CCoin*>(e->obj))
 			{
 				CCoin* coin = dynamic_cast<CCoin*>(e->obj);
-				coin->SetShow(false);
+				coin->SetState(COIN_STATE_HIDE);
 				marioCoin++;
 			}
 			if (dynamic_cast<CPortal*>(e->obj))

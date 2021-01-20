@@ -16,9 +16,28 @@ CCoin::CCoin(int temp)
 	SetState(COIN_STATE_IDLE);
 }
 
+void CCoin::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
+{
+
+	for (UINT i = 0; i < coObjects->size(); i++)
+	{
+		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
+		if (dynamic_cast<CCoin*>(coObjects->at(i)))
+		{
+			continue;
+		}
+
+		if (e->t > 0 && e->t <= 1.0f)
+			coEvents.push_back(e);
+		else
+			delete e;
+	}
+	std::sort(coEvents.begin(), coEvents.end(), CCollisionEvent::compare);
+}
+
 void CCoin::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
-	if (show == false)
+	if (state == COIN_STATE_HIDE)
 	{
 		l = t = r = b = 0;
 	}
@@ -71,7 +90,7 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			LPCOLLISIONEVENT e = coEventsResult[i];
 			if (dynamic_cast<CBrickQuestion*>(e->obj))
 			{
-				isDisAppear = true;
+				state = COIN_STATE_HIDE;
 			}
 		}
 	}
@@ -82,7 +101,7 @@ void CCoin::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 void CCoin::Render()
 {
-	if (!show)
+	if (state== COIN_STATE_HIDE)
 		return;
 	animation_set->at(0)->Render(x, y);
 }

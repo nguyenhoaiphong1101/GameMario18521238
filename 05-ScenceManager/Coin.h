@@ -8,6 +8,7 @@
 
 #define COIN_STATE_IDLE		0
 #define COIN_STATE_UP		1
+#define COIN_STATE_HIDE		2
 
 
 #define COIN			100
@@ -24,6 +25,7 @@ class CCoin : public CGameObject
 public:
 	
 	CCoin(int status);
+	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();

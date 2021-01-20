@@ -44,6 +44,7 @@ class CBrickQuestion : public CGameObject
 public:
 	int times = 10;
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
+	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	virtual void Render();
 	CBrickQuestion(int status);
