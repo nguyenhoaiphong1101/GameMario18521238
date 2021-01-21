@@ -144,6 +144,14 @@ void CPlayScene::ChooseMap()
 					CGame::GetInstance()->SwitchScene(p->GetSceneId());
 				}
 			}
+			if (marioSW->getFourth())
+			{
+				if (marioSW->getFourth())
+				{
+					CPortal* p = new CPortal(4);
+					CGame::GetInstance()->SwitchScene(p->GetSceneId());
+				}
+			}
 		}
 	}
 }
@@ -168,11 +176,8 @@ void CPlayScene::runRight()
 		if (dynamic_cast<CMarioSwitchMap*>(obj))
 		{
 			CMarioSwitchMap* marioSM = dynamic_cast<CMarioSwitchMap*>(obj);
-			if (!marioSM->getFirst())
-			{
 				marioSM->runRight();
 				int a = marioSM->x;
-			}
 		}
 	}
 }

@@ -7,6 +7,7 @@ class CMarioSwitchMap : public CGameObject
 {
 	bool first = false;
 	bool second = false;
+	bool fourth = false;
 	DWORD time;
 public:
 	CMarioSwitchMap() { vx = 0; vy = 0; };
@@ -16,6 +17,7 @@ public:
 	
 	bool getFirst() { return first; };
 	bool getSecond() { return second; };
+	bool getFourth() { return fourth; };
 	void runLeft();
 	void runRight();
 	void runUp();

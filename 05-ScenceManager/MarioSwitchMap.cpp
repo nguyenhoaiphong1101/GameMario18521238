@@ -2,7 +2,7 @@
 
 void CMarioSwitchMap::runLeft()
 {
-	if (x == 117 && y == 58)
+	if ((x == 148 && y == 4)|| (x == 100&& y == 50)|| (x == 185&& y == 4)|| (x == 230&& y == 4)|| (x == 230&& y == 50))
 	{
 		vx = -0.08f;
 		vy = 0;
@@ -10,7 +10,7 @@ void CMarioSwitchMap::runLeft()
 }
 void CMarioSwitchMap::runRight()
 {
-	if (x == 86 && y == 58)
+	if ((x == 50 && y == 50)|| (x == 100 && y == 4)|| (x == 148 && y == 4)|| (x == 185 && y == 4)|| (x == 185 && y == 50))
 	{
 		vx = 0.08f;
 		vy = 0;
@@ -18,7 +18,7 @@ void CMarioSwitchMap::runRight()
 }
 void CMarioSwitchMap::runUp()
 {
-	if (x == 117 && y == 58)
+	if ((x == 100 && y == 50) || (x == 185 && y == 50))
 	{
 		vy = -0.08f;
 		vx = 0;
@@ -28,7 +28,7 @@ void CMarioSwitchMap::runUp()
 
 void CMarioSwitchMap::runDown()
 {
-	if (x == 117 && y == 27)
+	if ((x == 100 && y == 4) || (x == 185 && y == 4))
 	{
 		vy = 0.08f;
 		vx = 0;
@@ -37,57 +37,129 @@ void CMarioSwitchMap::runDown()
 
 void CMarioSwitchMap::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+
+	first = false;
+	second = false;
+	fourth = false;
 	CGameObject::Update(dt);
 	x += dx;
 	y += dy;
 
 	if (vx > 0)
 	{
-		if (x >= 117)
+		
+		if (y == 50)
 		{
-			x = 117;
-			vx = 0;
+			if (x >= 100&&x<=120)
+			{
+				x = 100;
+				vx = 0;
+			}
+			if (x >= 230)
+			{
+				x = 230;
+				vx = 0;
+			}
+		}
+		if (y == 4)
+		{
+			if (x >= 148&&x<=155)
+			{
+				x = 148;
+				vx = 0;
+			}
+			if (x >= 185&&x<=195)
+			{
+				x = 185;
+				vx = 0;
+			}
+			if (x >= 230)
+			{
+				x = 230;
+				vx = 0;
+			}
 		}
 	}
 	else
 	{
 		if (vx < 0)
 		{
-			if (x <= 86)
+			if (y == 50)
 			{
-				x = 86;
-				vx = 0;
+				if (x <= 50)
+				{
+					x = 50;
+					vx = 0;
+				}
+				if (x <= 185&&x>=130)
+				{
+					x = 185;
+					vx = 0;
+				}
+			}
+			if (y == 4)
+			{
+				if (x <= 185)
+				{
+					x = 185;
+					vx = 0;
+				}
+				else if (x <= 148)
+				{
+					x = 148;
+					vx = 0;
+				}
+				else if (x <= 100)
+				{
+					x = 100;
+					vx = 0;
+				}
 			}
 		}
 	}
 	if (vy > 0)
 	{
-		if (y >= 58)
+		if (x == 100)
 		{
-			y = 58;
-			vy = 0;
+			if (y >= 50)
+			{
+				y = 50;
+				vy = 0;
+			}
+		}
+		if (x == 185)
+		{
+			if (y >= 50)
+			{
+				y = 50;
+				vy = 0;
+			}
 		}
 	}
 	else
 	{
 		if (vy < 0)
 		{
-			if (y <= 27)
+			if (y <= 4)
 			{
-				y = 27;
+				y = 4;
 				vy = 0;
 			}
 		}
 	}
 
 
-	if (x == 117 && y == 27)
+	if (x == 100 && y == 4)
 	{
 		first = true;
 	}
-	else
+	if (x == 185 && y == 4)
 	{
-		first = false;
+		first = true;
+	}
+	if (x == 230 && y == 50)
+	{
+		fourth = true;
 	}
 }
 
