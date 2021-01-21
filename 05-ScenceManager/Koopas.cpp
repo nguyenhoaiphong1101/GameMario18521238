@@ -9,6 +9,7 @@
 #include <algorithm>
 #include "FireFlower.h"
 #include "BrickBroken.h"
+#include "BrickQuestion.h"
 
 CKoopas::CKoopas()
 {
@@ -74,6 +75,7 @@ void CKoopas::GetBoundingBox(float& left, float& top, float& right, float& botto
 
 void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
+	int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
 	LPSCENE scence = CGame::GetInstance()->GetCurrentScene();
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	//
@@ -101,18 +103,25 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		x += dx;
 		y += dy;
 		
-		if (back&&(state== KOOPAS_STATE_WALKING))
+		if (ids == 4)
 		{
-			if (y - tempbacky >= 1.0f)
+			if (x < 1763)
 			{
-				y -= 5;
-				if (vx < 0)
-					x += 12;
-				else
-					x -= 12;
-				vx = -vx;
+				if (back && (state == KOOPAS_STATE_WALKING))
+				{
+					if (y - tempbacky >= 1.0f)
+					{
+						y -= 5;
+						if (vx < 0)
+							x += 12;
+						else
+							x -= 12;
+						vx = -vx;
+					}
+				}
 			}
 		}
+		
 	}
 	else
 	{
@@ -147,9 +156,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			if (dynamic_cast<CBrickBroken*>(e->obj) && nx == 0)
 			{
 				CBrickBroken* brick = dynamic_cast<CBrickBroken*>(e->obj);
-				if (brick->GetState() == BRICK_BROKEN_STATE_COIN)
+				if (nx != 0)
 				{
-					brick->SetState(BRICK_BROKEN_STATE_HIDE);
+					if (brick->GetState() == BRICK_BROKEN_STATE_COIN)
+					{
+						brick->SetState(BRICK_BROKEN_STATE_HIDE);
+					}
+					vx = -vx;
 				}
 			}
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
@@ -210,6 +223,15 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					vx = -vx;
 				}
 			}
+			if (dynamic_cast<CBrickQuestion*>(e->obj))
+			{
+				
+				if (nx != 0 )
+				{
+					vx = -vx;
+				}
+			}
+			
 		}
 		
 	}
@@ -225,15 +247,31 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			if (mario->GetLevel() != MARIO_LEVEL_SMALL)
 			{
-				if (mario->nx > 0)
+				if (mario->GetLevel() == MARIO_LEVEL_FOX)
 				{
-					x = mario->x + MARIO_BIG_BBOX_WIDTH;
-					y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					if (mario->nx > 0)
+					{
+						x = mario->x + MARIO_FOX_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
+					else
+					{
+						x = mario->x - KOOPAS_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
 				}
 				else
 				{
-					x = mario->x - KOOPAS_BBOX_WIDTH;
-					y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					if (mario->nx > 0)
+					{
+						x = mario->x + MARIO_BIG_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
+					else
+					{
+						x = mario->x - KOOPAS_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
 				}
 			}
 			else

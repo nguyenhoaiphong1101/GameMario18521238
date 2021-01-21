@@ -21,6 +21,9 @@
 #include "MarioSwitchMap.h"
 #include "BrickBroken.h"
 #include "RectangleMove.h"
+#include "KoopaBoomerang.h"
+#include "Boomerang.h"
+#include "ContentEnd.h"
 
 
 
@@ -77,6 +80,12 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_BRICK_QUESTION_SPECIAL_GREEN	27
 #define OBJECT_TYPE_CARD	28
 #define OBJECT_TYPE_RETANGLE_MOVE	29
+#define OBJECT_TYPE_BOOMERANG_ENEMY	30
+#define OBJECT_TYPE_BOOMERANG	31
+#define OBJECT_TYPE_CONTENTEND	32
+#define OBJECT_TYPE_CONTENTEND_MUSH	33
+#define OBJECT_TYPE_CONTENTEND_STAR	34
+#define OBJECT_TYPE_CONTENTEND_TREE	35
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -340,6 +349,19 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_BRICK_BROKEN:	  obj = new CBrickBroken(); break;
 	case OBJECT_TYPE_CARD:	  obj = new CCard(); break;
 	case OBJECT_TYPE_RETANGLE_MOVE:	  obj = new CRectangleMove(); break;
+	case OBJECT_TYPE_CONTENTEND:	  obj = new ContentEnd(0); break;
+	case OBJECT_TYPE_CONTENTEND_MUSH:	  obj = new ContentEnd(1); break;
+	case OBJECT_TYPE_CONTENTEND_STAR:	  obj = new ContentEnd(2); break;
+	case OBJECT_TYPE_CONTENTEND_TREE:	  obj = new ContentEnd(3); break;
+	case OBJECT_TYPE_BOOMERANG_ENEMY:
+		obj = new CKoopaBoomerang();
+		break;
+	case OBJECT_TYPE_BOOMERANG:
+	{
+		int boomerang_id = atof(tokens[4].c_str());
+		obj = new CBoomerang(boomerang_id);
+	}
+	break;
 	case OBJECT_TYPE_PORTAL:
 	{
 		float r = atof(tokens[4].c_str());
@@ -559,12 +581,13 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 {
 	//DebugOut(L"[INFO] KeyDown: %d\n", KeyCode);
 	CGame* game = CGame::GetInstance();
+	int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
 
 
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	if (mario != NULL)
 	{
-		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2 && mario->checkEnd == false && mario->GetState() != MARIO_STATE_DIE)
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2&& mario->GetState() != MARIO_STATE_DRAIN_3 && mario->checkEnd == false && mario->GetState() != MARIO_STATE_DIE)
 		{
 			switch (KeyCode)
 			{
@@ -597,6 +620,12 @@ void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)
 				break;
 			case DIK_R:
 				mario->Reset();
+				break;
+			case DIK_E:
+				if (ids == 4)
+				{
+					mario->MovetoLocation();
+				}
 				break;
 			case DIK_A:
 				if (mario->GetLevel() == MARIO_LEVEL_FIRE)
@@ -676,7 +705,7 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	if (mario != NULL)
 	{
-		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2 && mario->GetState() != MARIO_STATE_DIE && mario->checkEnd == false)
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2&& mario->GetState() != MARIO_STATE_DRAIN_3 && mario->GetState() != MARIO_STATE_DIE && mario->checkEnd == false)
 		{
 			switch (KeyCode)
 			{
@@ -729,7 +758,7 @@ void CPlayScenceKeyHandler::KeyState(BYTE* states)
 	{
 		if (mario->GetState() == MARIO_STATE_DIE) return;
 
-		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2)
+		if (mario->GetState() != MARIO_STATE_DRAIN_1 && mario->GetState() != MARIO_STATE_DRAIN_2&& mario->GetState() != MARIO_STATE_DRAIN_3)
 		{
 			if (game->IsKeyDown(DIK_RIGHT))
 			{

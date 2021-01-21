@@ -6,6 +6,7 @@
 #include "Koopas.h"
 #include "PlayScence.h"
 #include "Game.h"
+#include "RectangleMove.h"
 #include <algorithm>
 
 CKoopaPara::CKoopaPara()
@@ -167,6 +168,14 @@ void CKoopaPara::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					vx = -vx;
 				}
 			}
+			if (dynamic_cast<CRectangleMove*>(e->obj))
+			{
+
+				if (nx != 0)
+				{
+					vx = -vx;
+				}
+			}
 		}
 	}
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
@@ -181,15 +190,31 @@ void CKoopaPara::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			if (mario->GetLevel() != MARIO_LEVEL_SMALL)
 			{
-				if (mario->nx > 0)
+				if (mario->GetLevel() == MARIO_LEVEL_FOX)
 				{
-					x = mario->x + MARIO_BIG_BBOX_WIDTH;
-					y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					if (mario->nx > 0)
+					{
+						x = mario->x + MARIO_FOX_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
+					else
+					{
+						x = mario->x - KOOPAS_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
 				}
 				else
 				{
-					x = mario->x - KOOPAS_BBOX_WIDTH;
-					y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					if (mario->nx > 0)
+					{
+						x = mario->x + MARIO_BIG_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
+					else
+					{
+						x = mario->x - KOOPAS_BBOX_WIDTH;
+						y = mario->y + MARIO_BIG_BBOX_HEIGHT / 5;
+					}
 				}
 			}
 			else

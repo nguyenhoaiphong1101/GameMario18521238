@@ -126,12 +126,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Animations.cpp" />
+    <ClCompile Include="Boomerang.cpp" />
     <ClCompile Include="Box.cpp" />
     <ClCompile Include="Brick.cpp" />
     <ClCompile Include="BrickBroken.cpp" />
     <ClCompile Include="BrickQuestion.cpp" />
     <ClCompile Include="Card.cpp" />
     <ClCompile Include="Coin.cpp" />
+    <ClCompile Include="ContentEnd.cpp" />
     <ClCompile Include="Drain.cpp" />
     <ClCompile Include="Effect.cpp" />
     <ClCompile Include="Fire.cpp" />
@@ -140,6 +142,7 @@
     <ClCompile Include="GoombaPara.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="IntroMario.cpp" />
+    <ClCompile Include="KoopaBoomerang.cpp" />
     <ClCompile Include="KoopaPara.cpp" />
     <ClCompile Include="Koopas.cpp" />
     <ClCompile Include="Leaf.cpp" />
@@ -162,12 +165,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Animations.h" />
+    <ClInclude Include="Boomerang.h" />
     <ClInclude Include="Box.h" />
     <ClInclude Include="Brick.h" />
     <ClInclude Include="BrickBroken.h" />
     <ClInclude Include="BrickQuestion.h" />
     <ClInclude Include="Card.h" />
     <ClInclude Include="Coin.h" />
+    <ClInclude Include="ContentEnd.h" />
     <ClInclude Include="Drain.h" />
     <ClInclude Include="Effect.h" />
     <ClInclude Include="Fire.h" />
@@ -176,6 +181,7 @@
     <ClInclude Include="GoombaPara.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="IntroMario.h" />
+    <ClInclude Include="KoopaBoomerang.h" />
     <ClInclude Include="KoopaPara.h" />
     <ClInclude Include="Koopas.h" />
     <ClInclude Include="Leaf.h" />

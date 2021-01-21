@@ -33,6 +33,7 @@
 #define MARIO_STATE_DRAIN_1			503
 #define MARIO_STATE_DRAIN_2			504
 #define MARIO_STATE_END			505
+#define MARIO_STATE_DRAIN_3			506
 
 
 #define MARIO_ANI_BIG_IDLE_RIGHT		0
@@ -156,6 +157,11 @@
 #define MARIO_FLY_LEVEL 7
 #define MARIO_FLY_LEVEL_SPEED 200
 
+#define MARIO_MAP_Y_4 256
+#define MARIO_MAP_X_4 2064
+#define MARIO_MAP_X_4_LIMIT 2050
+#define MARIO_FLY_LEVEL_SPEED 200
+
 
 class CMario : public CGameObject
 {
@@ -207,6 +213,7 @@ public:
 	void SetState(int state);
 	void SetLevel(int l) { level = l; }
 	int GetLevel() { return level; };
+	void MovetoLocation();
 	void StartUntouchable() { untouchable = 1; untouchable_start = GetTickCount(); }
 
 	void Reset();
