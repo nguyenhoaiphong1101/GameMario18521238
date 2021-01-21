@@ -23,6 +23,8 @@
 
 class CKoopas : public CGameObject
 {
+	float tempbacky;
+	bool back = false;
 	void CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents);
 	virtual void GetBoundingBox(float &left, float &top, float &right, float &bottom);
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects);

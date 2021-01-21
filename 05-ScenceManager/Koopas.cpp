@@ -8,6 +8,7 @@
 #include "GoombaPara.h"
 #include <algorithm>
 #include "FireFlower.h"
+#include "BrickBroken.h"
 
 CKoopas::CKoopas()
 {
@@ -99,7 +100,19 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	{
 		x += dx;
 		y += dy;
-
+		
+		if (back&&(state== KOOPAS_STATE_WALKING))
+		{
+			if (y - tempbacky >= 1.0f)
+			{
+				y -= 5;
+				if (vx < 0)
+					x += 12;
+				else
+					x -= 12;
+				vx = -vx;
+			}
+		}
 	}
 	else
 	{
@@ -126,6 +139,19 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			{
 				vx = -vx;
 			}*/
+			if (!dynamic_cast<CMario*>(e->obj) && nx == 0)
+			{
+				tempbacky = y;
+				back = true;
+			}
+			if (dynamic_cast<CBrickBroken*>(e->obj) && nx == 0)
+			{
+				CBrickBroken* brick = dynamic_cast<CBrickBroken*>(e->obj);
+				if (brick->GetState() == BRICK_BROKEN_STATE_COIN)
+				{
+					brick->SetState(BRICK_BROKEN_STATE_HIDE);
+				}
+			}
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
@@ -185,6 +211,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 			}
 		}
+		
 	}
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	if (x < 0)
@@ -230,29 +257,72 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 
 	}
+	
 
 }
 
 void CKoopas::Render()
 {
+	int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
 	int ani = KOOPAS_ANI_WALKING_LEFT;
 	if (state == KOOPAS_STATE_HOLD)
 	{
+		if (ids == 4)
+		{
+			ani = 6;
+		}
+		else
 		ani = KOOPAS_ANI_DIE;
 	}
 	else
 		if (state == KOOPAS_STATE_DIE) {
 			if (vx != 0)
+			{
+				if (ids == 4)
+				{
+					ani = 7;
+				}
+				else
 				ani = KOOPAS_ANI_TURN;
+			}
 			else
+			{
+				if (ids == 4)
+				{
+					ani = 6;
+				}
+				else
 				ani = KOOPAS_ANI_DIE;
+			}
+				
 		}
 		else if (state == KOOPAS_STATE_THROW)
 		{
+			if (ids == 4)
+			{
+				ani = 7;
+			}
+			else
 			ani = KOOPAS_ANI_TURN;
 		}
-		else if (vx > 0) ani = KOOPAS_ANI_WALKING_RIGHT;
-		else if (vx < 0) ani = KOOPAS_ANI_WALKING_LEFT;
+		else if (vx > 0)
+		{
+			if (ids == 4)
+			{
+				ani = 5;
+			}
+			else
+			ani = KOOPAS_ANI_WALKING_RIGHT;
+		}
+		else if (vx < 0)
+		{
+			if (ids == 4)
+			{
+				ani = 4;
+			}
+			else
+			ani = KOOPAS_ANI_WALKING_LEFT;
+		}
 
 	animation_set->at(ani)->Render(x, y);
 

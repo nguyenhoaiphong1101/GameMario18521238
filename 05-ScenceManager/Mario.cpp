@@ -742,7 +742,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							{
 								if (koopas->GetState() != KOOPAS_STATE_DIE)
 								{
-									if (koopas->GetState() == KOOPAS_STATE_JUMP)
+									if (koopas->GetState() == KOOPAS_STATE_JUMP|| koopas->GetState() == KOOPAS_STATE_VERTICAL)
 									{
 										koopas->SetState(KOOPAS_STATE_WALKING);
 									}
@@ -948,7 +948,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (ids == 4)
 	{
 		camX_update += 0.04f * dt;
-		CGame::GetInstance()->SetCamPos((int)camX_update, (int)220);
+		CGame::GetInstance()->SetCamPos((int)0, (int)220);
 	}
 	else
 	{
@@ -956,7 +956,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (x < camX_update)
 	{
-		x = camX_update;
+		//x = camX_update;
 	}
 }
 

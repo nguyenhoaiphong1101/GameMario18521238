@@ -10,8 +10,16 @@
 
 CKoopaPara::CKoopaPara()
 {
-	SetState(KOOPAS_STATE_JUMP);
-	checkJump = GetTickCount();
+	int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
+	if (ids == 4)
+	{
+		SetState(KOOPAS_STATE_VERTICAL);
+	}
+	else
+	{
+		SetState(KOOPAS_STATE_JUMP);
+		checkJump = GetTickCount();
+	}
 }
 
 void CKoopaPara::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCOLLISIONEVENT>& coEvents)
@@ -46,12 +54,12 @@ void CKoopaPara::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector
 void CKoopaPara::GetBoundingBox(float& left, float& top, float& right, float& bottom)
 {
 
-	
+
 	left = x;
 	top = y;
 	right = x + KOOPAS_BBOX_WIDTH;
 
-	if (state == KOOPAS_STATE_WALKING|| state == KOOPAS_STATE_JUMP)
+	if (state == KOOPAS_STATE_WALKING || state == KOOPAS_STATE_JUMP)
 		bottom = y + KOOPAS_BBOX_HEIGHT;
 	else
 		bottom = y + KOOPAS_BBOX_HEIGHT_DIE;
@@ -77,7 +85,7 @@ void CKoopaPara::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	// TO-DO: make sure Goomba can interact with the world and to each of them too!
 	CGameObject::Update(dt);
 
-	if (state != KOOPAS_STATE_HOLD)
+	if (state != KOOPAS_STATE_HOLD && state != KOOPAS_STATE_VERTICAL)
 		vy += dt * KOOPAS_GRAVITY;
 
 
@@ -206,37 +214,89 @@ void CKoopaPara::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	}
 
+	if (state == KOOPAS_STATE_VERTICAL)
+	{
+		if (y > (CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() * 3 / 4 - KOOPAS_BBOX_HEIGHT /*+ CGame::GetInstance()->GetScreenHeight() * 3 / 4)*/))
+		{
+
+			vy = -vy;
+		}
+		if (y < (CGame::GetInstance()->GetCamPosY() + CGame::GetInstance()->GetScreenHeight() * 1 / 4))
+		{
+			vy = -vy;
+		}
+	}
+
 }
 
 void CKoopaPara::Render()
 {
+	int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
 	int ani = KOOPASPARA_ANI_WALKING_LEFT;
 	if (state == KOOPAS_STATE_HOLD)
 	{
-		ani = KOOPASPARA_ANI_DIE;
+		if (ids == 4)
+		{
+			ani = 9;
+		}
+		else
+			ani = KOOPASPARA_ANI_DIE;
 	}
 	else
 		if (state == KOOPAS_STATE_DIE) {
 			if (vx != 0)
-				ani = KOOPASPARA_ANI_TURN;
+			{
+				if (ids == 4)
+				{
+					ani = 10;
+				}
+				else
+					ani = KOOPASPARA_ANI_TURN;
+			}
 			else
-				ani = KOOPASPARA_ANI_DIE;
+			{
+				if (ids == 4)
+				{
+					ani = 9;
+				}
+				else
+					ani = KOOPASPARA_ANI_DIE;
+			}
 		}
 		else if (state == KOOPAS_STATE_THROW)
 		{
-			ani = KOOPASPARA_ANI_TURN;
-		}else if(state == KOOPAS_STATE_JUMP)
+			if (ids == 4)
 			{
-				if (vx > 0) ani = KOOPASPARA_ANI_JUMP_RIGHT;
-				else if (vx < 0) ani = KOOPASPARA_ANI_JUMP_LEFT;
+				ani = 10;
+			}
+			else
+			ani = KOOPASPARA_ANI_TURN;
+		}
+		else if (state == KOOPAS_STATE_JUMP)
+		{
+			if (vx > 0) ani = KOOPASPARA_ANI_JUMP_RIGHT;
+			else if (vx < 0) ani = KOOPASPARA_ANI_JUMP_LEFT;
+		}
+		else if (state == KOOPAS_STATE_VERTICAL)
+		{
+			ani = 6;
 		}
 		else
 		{
-			if (vx > 0) ani = KOOPASPARA_ANI_WALKING_RIGHT;
-			else if (vx < 0) ani = KOOPASPARA_ANI_WALKING_LEFT;
+			if (ids == 4)
+			{
+				if (vx > 0) ani = 8;
+				else if (vx < 0) ani = 7;
+			}
+			else
+			{
+				if (vx > 0) ani = KOOPASPARA_ANI_WALKING_RIGHT;
+				else if (vx < 0) ani = KOOPASPARA_ANI_WALKING_LEFT;
+			}
+			
 		}
-		
-		
+
+
 
 	animation_set->at(ani)->Render(x, y);
 
@@ -257,6 +317,10 @@ void CKoopaPara::SetState(int state)
 		break;
 	case KOOPAS_STATE_JUMP:
 		vx = -KOOPAS_WALKING_SPEED;
+		nx = -1;
+		break;
+	case KOOPAS_STATE_VERTICAL:
+		vy = KOOPAS_WALKING_SPEED;
 		nx = -1;
 		break;
 	case KOOPAS_STATE_WALKING:
