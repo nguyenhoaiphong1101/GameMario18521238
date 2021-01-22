@@ -8,6 +8,13 @@
 #define BOOMERANG_BBOX_WIDTH  16
 #define BOOMERANG_BBOX_HEIGHT 16
 
+#define BOOMERANG_ENE_X 8
+#define BOOMERANG_ENE_Y 5
+
+
+#define BOOMERANG_ENE_Y 5
+#define BOOMERANG_ENE_Y 5
+
 
 
 

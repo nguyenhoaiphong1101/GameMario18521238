@@ -1,5 +1,4 @@
-﻿#include "HUD.h"
-#include "Scence.h"
+﻿#include "Scence.h"
 #include "Game.h"
 #include "Mario.h"
 #include "PlayScence.h"

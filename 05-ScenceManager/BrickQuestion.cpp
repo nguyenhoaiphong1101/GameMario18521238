@@ -165,6 +165,7 @@ void CBrickQuestion::Render()
 
 void CBrickQuestion::SetState(int state)
 {
+	int id = CGame::GetInstance()->GetCurrentScene()->GetId();
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 	LPSCENE scene = CGame::GetInstance()->GetCurrentScene();
 	if (state == BRICK_QUESTION_STATE_AFTER)
@@ -190,6 +191,8 @@ void CBrickQuestion::SetState(int state)
 			leaf->y = y - MUSHROOM_BBOX_HEIGHT * BRICK_QUESTION_LEAF;
 			LPANIMATION_SET ani_set = animation_sets->Get(BRICK_QUESTION_ANI_LEAF);
 			leaf->SetAnimationSet(ani_set);
+			if (id == 4)
+				leaf->SetRenderLayer(3);
 			((CPlayScene*)scene)->addObject(leaf);
 			break;
 
@@ -202,6 +205,7 @@ void CBrickQuestion::SetState(int state)
 			mushroom->vx = -MUSHROOM_SPEED;
 			LPANIMATION_SET ani_set = animation_sets->Get(BRICK_QUESTION_ANI_MUSHROOM);
 			mushroom->SetAnimationSet(ani_set);
+
 			((CPlayScene*)scene)->addObject(mushroom);
 			break;
 		}
@@ -221,12 +225,12 @@ void CBrickQuestion::SetState(int state)
 				if (x > mario->x)
 				{
 					mushroom->vx = -MUSHROOM_SPEED;
+					mushroom->y = y - MUSHROOM_BBOX_HEIGHT * 1.8;
 				}
 				else
 				{
 					mushroom->vx = MUSHROOM_SPEED;
 				}
-				mushroom->y = y - MUSHROOM_BBOX_HEIGHT * 2;
 			}
 			break;
 		}

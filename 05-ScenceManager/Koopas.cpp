@@ -10,6 +10,7 @@
 #include "FireFlower.h"
 #include "BrickBroken.h"
 #include "BrickQuestion.h"
+#include "Coin.h"
 
 CKoopas::CKoopas()
 {
@@ -24,8 +25,8 @@ void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 		LPCOLLISIONEVENT e = SweptAABBEx(coObjects->at(i));
 		if (dynamic_cast<CGoomba*>(coObjects->at(i)))
 		{
-			if(GetState()!= KOOPAS_STATE_THROW)
-			continue;
+			if (GetState() != KOOPAS_STATE_THROW)
+				continue;
 		}
 		if (dynamic_cast<CGoombaPara*>(coObjects->at(i)))
 		{
@@ -41,6 +42,10 @@ void CKoopas::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LP
 		{
 			if (e->nx != 0)
 				continue;
+		}
+		if (dynamic_cast<CCoin*>(coObjects->at(i)))
+		{
+			continue;
 		}
 
 
@@ -96,13 +101,13 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (state != KOOPAS_STATE_HOLD && state != KOOPAS_STATE_HIDE)
 		CalcPotentialCollisions(coObjects, coEvents);
 
-	float tempy=y+dy;
+	float tempy = y + dy;
 	// No collision occured, proceed normally
 	if (coEvents.size() == 0)
 	{
 		x += dx;
 		y += dy;
-		
+
 		if (ids == 4)
 		{
 			if (x < 1763)
@@ -121,7 +126,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 			}
 		}
-		
+
 	}
 	else
 	{
@@ -135,8 +140,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		if (state != KOOPAS_STATE_DIE && state != KOOPAS_STATE_THROW && state != KOOPAS_STATE_HIDE)
 		{
 			x += min_tx * dx + nx * 0.4f;
-			if(nx <0)
-			y += min_ty * dy + ny * 0.4f;
+			if (nx < 0)
+				y += min_ty * dy + ny * 0.4f;
 
 		}
 		if (ny != 0) vy = 0;
@@ -153,18 +158,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				tempbacky = y;
 				back = true;
 			}
-			if (dynamic_cast<CBrickBroken*>(e->obj) && nx == 0)
-			{
-				CBrickBroken* brick = dynamic_cast<CBrickBroken*>(e->obj);
-				if (nx != 0)
-				{
-					if (brick->GetState() == BRICK_BROKEN_STATE_COIN)
-					{
-						brick->SetState(BRICK_BROKEN_STATE_HIDE);
-					}
-					vx = -vx;
-				}
-			}
+
 			if (dynamic_cast<CGoomba*>(e->obj)) // if e->obj is Goomba 
 			{
 				CGoomba* goomba = dynamic_cast<CGoomba*>(e->obj);
@@ -197,8 +191,8 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 				if (state == KOOPAS_STATE_THROW)
 				{
-						mario->ScoreUp();
-						goomba->SetState(GOOMBA_STATE_DIE_DOWN);
+					mario->ScoreUp();
+					goomba->SetState(GOOMBA_STATE_DIE_DOWN);
 				}
 			}
 			if (dynamic_cast<CBox*>(e->obj))
@@ -217,23 +211,35 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CBrick*>(e->obj))
 			{
-				
-				if (nx != 0 )
+				if (nx != 0)
 				{
 					vx = -vx;
 				}
 			}
+
 			if (dynamic_cast<CBrickQuestion*>(e->obj))
 			{
+				CBrickQuestion* brickQuestion = dynamic_cast<CBrickQuestion*>(e->obj);
 				
-				if (nx != 0 )
+				if (brickQuestion->GetAfter())
 				{
-					vx = -vx;
+					if (state != KOOPAS_STATE_DIE)
+						SetState(KOOPAS_STATE_DIE);
+					
+					x =brickQuestion->x+ 16;
 				}
 			}
-			
+			if (dynamic_cast<CBrickBroken*>(e->obj))
+			{
+				CBrickBroken* brick = dynamic_cast<CBrickBroken*>(e->obj);
+
+				if (nx != 0)
+						vx = -vx;
+			}
+
+
 		}
-		
+
 	}
 	for (UINT i = 0; i < coEvents.size(); i++) delete coEvents[i];
 	if (x < 0)
@@ -295,7 +301,7 @@ void CKoopas::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		}
 
 	}
-	
+
 
 }
 
@@ -310,7 +316,7 @@ void CKoopas::Render()
 			ani = 6;
 		}
 		else
-		ani = KOOPAS_ANI_DIE;
+			ani = KOOPAS_ANI_DIE;
 	}
 	else
 		if (state == KOOPAS_STATE_DIE) {
@@ -321,7 +327,7 @@ void CKoopas::Render()
 					ani = 7;
 				}
 				else
-				ani = KOOPAS_ANI_TURN;
+					ani = KOOPAS_ANI_TURN;
 			}
 			else
 			{
@@ -330,9 +336,9 @@ void CKoopas::Render()
 					ani = 6;
 				}
 				else
-				ani = KOOPAS_ANI_DIE;
+					ani = KOOPAS_ANI_DIE;
 			}
-				
+
 		}
 		else if (state == KOOPAS_STATE_THROW)
 		{
@@ -341,7 +347,7 @@ void CKoopas::Render()
 				ani = 7;
 			}
 			else
-			ani = KOOPAS_ANI_TURN;
+				ani = KOOPAS_ANI_TURN;
 		}
 		else if (vx > 0)
 		{
@@ -350,7 +356,7 @@ void CKoopas::Render()
 				ani = 5;
 			}
 			else
-			ani = KOOPAS_ANI_WALKING_RIGHT;
+				ani = KOOPAS_ANI_WALKING_RIGHT;
 		}
 		else if (vx < 0)
 		{
@@ -359,7 +365,7 @@ void CKoopas::Render()
 				ani = 4;
 			}
 			else
-			ani = KOOPAS_ANI_WALKING_LEFT;
+				ani = KOOPAS_ANI_WALKING_LEFT;
 		}
 
 	animation_set->at(ani)->Render(x, y);

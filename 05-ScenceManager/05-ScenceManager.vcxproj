@@ -132,6 +132,7 @@
     <ClCompile Include="BrickBroken.cpp" />
     <ClCompile Include="BrickQuestion.cpp" />
     <ClCompile Include="Card.cpp" />
+    <ClCompile Include="Cell.cpp" />
     <ClCompile Include="Coin.cpp" />
     <ClCompile Include="ContentEnd.cpp" />
     <ClCompile Include="Drain.cpp" />
@@ -140,6 +141,7 @@
     <ClCompile Include="FireFlower.cpp" />
     <ClCompile Include="FlowerAttack.cpp" />
     <ClCompile Include="GoombaPara.cpp" />
+    <ClCompile Include="Grid.cpp" />
     <ClCompile Include="HUD.cpp" />
     <ClCompile Include="IntroMario.cpp" />
     <ClCompile Include="KoopaBoomerang.cpp" />
@@ -171,6 +173,7 @@
     <ClInclude Include="BrickBroken.h" />
     <ClInclude Include="BrickQuestion.h" />
     <ClInclude Include="Card.h" />
+    <ClInclude Include="Cell.h" />
     <ClInclude Include="Coin.h" />
     <ClInclude Include="ContentEnd.h" />
     <ClInclude Include="Drain.h" />
@@ -179,6 +182,7 @@
     <ClInclude Include="FireFlower.h" />
     <ClInclude Include="FlowerAttack.h" />
     <ClInclude Include="GoombaPara.h" />
+    <ClInclude Include="Grid.h" />
     <ClInclude Include="HUD.h" />
     <ClInclude Include="IntroMario.h" />
     <ClInclude Include="KoopaBoomerang.h" />

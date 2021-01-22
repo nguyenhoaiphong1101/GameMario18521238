@@ -77,5 +77,9 @@ public:
 	{
 		check = status;
 	}
+	bool GetUp()
+	{
+		return check;
+	}
 };
 

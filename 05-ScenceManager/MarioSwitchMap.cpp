@@ -5,7 +5,7 @@ void CMarioSwitchMap::runLeft()
 	if ((x == 148 && y == 4)|| (x == 100&& y == 50)|| (x == 185&& y == 4)|| (x == 230&& y == 4)|| (x == 230&& y == 50))
 	{
 		x -= 3;
-		vx = -0.08f;
+		vx = -0.12f;
 		vy = 0;
 	}
 }
@@ -14,7 +14,7 @@ void CMarioSwitchMap::runRight()
 	if ((x == 50 && y == 50)|| (x == 100 && y == 4)|| (x == 148 && y == 4)|| (x == 185 && y == 4)|| (x == 185 && y == 50))
 	{
 		x += 3;
-		vx = 0.08f;
+		vx = 0.12f;
 		vy = 0;
 	}
 }
@@ -22,7 +22,7 @@ void CMarioSwitchMap::runUp()
 {
 	if ((x == 100 && y == 50) || (x == 185 && y == 50))
 	{
-		vy = -0.08f;
+		vy = -0.12f;
 		vx = 0;
 	}
 }
@@ -32,7 +32,7 @@ void CMarioSwitchMap::runDown()
 {
 	if ((x == 100 && y == 4) || (x == 185 && y == 4))
 	{
-		vy = 0.08f;
+		vy = 0.12f;
 		vx = 0;
 	}
 }

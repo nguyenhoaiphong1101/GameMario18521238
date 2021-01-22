@@ -1,29 +1,6 @@
-﻿#include <iostream>
-#include <fstream>
+﻿
 #include "PlayScence.h"
-#include "Utils.h"
-#include "Textures.h"
-#include "Sprites.h"
-#include "Portal.h"
-#include "NoCollision.h"
-#include "Box.h"
-#include "Drain.h"
-#include "Fire.h"
-#include "HUD.h"
-#include "Coin.h"
-#include "BrickQuestion.h"
-#include "FlowerAttack.h"
-#include "GoombaPara.h"
-#include "KoopaPara.h"
-#include "Card.h"
-#include "IntroMario.h"
-#include "FireFlower.h"
-#include "MarioSwitchMap.h"
-#include "BrickBroken.h"
-#include "RectangleMove.h"
-#include "KoopaBoomerang.h"
-#include "Boomerang.h"
-#include "ContentEnd.h"
+
 
 
 
@@ -49,6 +26,7 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define SCENE_SECTION_ANIMATION_SETS	5
 #define SCENE_SECTION_OBJECTS	6
 #define SCENE_SECTION_MAP				7
+#define SCENE_SECTION_GRID				8
 
 #define OBJECT_TYPE_MARIO	0
 #define OBJECT_TYPE_BRICK	1
@@ -308,6 +286,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	float y = atof(tokens[2].c_str());
 
 	int ani_set_id = atoi(tokens[3].c_str());
+	int id = CGame::GetInstance()->GetCurrentScene()->GetId();
 
 	CAnimationSets* animation_sets = CAnimationSets::GetInstance();
 
@@ -369,7 +348,7 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 		break;
 	case OBJECT_TYPE_BOOMERANG:
 	{
-		int boomerang_id = atof(tokens[4].c_str());
+		int boomerang_id = atof(tokens[5].c_str());
 		obj = new CBoomerang(boomerang_id);
 	}
 	break;
@@ -387,13 +366,18 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	}
 
 	// General object setup
-	obj->SetPosition(x, y);
 
 	LPANIMATION_SET ani_set = animation_sets->Get(ani_set_id);
-
-	obj->SetAnimationSet(ani_set);
-
-	objects.push_back(obj);
+	if (obj != NULL)
+	{
+			obj->SetPosition(x, y);
+			obj->SetAnimationSet(ani_set);
+			obj->SetOrigin(x, y, obj->GetState());
+			if(id==4)
+			obj->SetRenderLayer(atoi(tokens[4].c_str()));
+			obj->SetisOriginObj(true);
+			objects.push_back(obj);
+	}
 }
 
 void CPlayScene::_ParseSection_MAP(string line)
@@ -413,6 +397,18 @@ void CPlayScene::_ParseSection_MAP(string line)
 	map = new Map(idTileSet, totalRowsTileSet, totalColumnsTileSet, totalRowsMap, totalColumnsMap, totalTiles);
 	map->LoadMap(file_path.c_str());
 	map->ExtractTileFromTileSet();
+}
+
+void CPlayScene::_ParseSection_GRID(string line)
+{
+	vector<string> tokens = split(line);
+
+	if (tokens.size() < 1) return;
+
+	wstring file_path = ToWSTR(tokens[0]);
+
+	if (grid == NULL)
+		grid = new CGrid(file_path.c_str());
 }
 
 void CPlayScene::Load()
@@ -446,6 +442,9 @@ void CPlayScene::Load()
 		if (line == "[OBJECTS]") {
 			section = SCENE_SECTION_OBJECTS; continue;
 		}
+		if (line == "[GRID]") {
+			section = SCENE_SECTION_GRID; continue;
+		}
 		if (line[0] == '[') { section = SCENE_SECTION_UNKNOWN; continue; }
 
 		//
@@ -459,6 +458,7 @@ void CPlayScene::Load()
 		case SCENE_SECTION_ANIMATIONS: _ParseSection_ANIMATIONS(line); break;
 		case SCENE_SECTION_ANIMATION_SETS: _ParseSection_ANIMATION_SETS(line); break;
 		case SCENE_SECTION_OBJECTS: _ParseSection_OBJECTS(line); break;
+		case SCENE_SECTION_GRID: _ParseSection_GRID(line); break;
 		}
 	}
 
@@ -525,10 +525,10 @@ void CPlayScene::Update(DWORD dt)
 				int id = CGame::GetInstance()->GetCurrentScene()->GetId();
 				if (id == 4)
 				{
-					if (obj->x <= CGame::GetInstance()->GetCamPosX()+400)
+					/*if (obj->x <= CGame::GetInstance()->GetCamPosX()+400)
 					{
 						objects[i]->Update(dt, &coObjects);
-					}
+					}*/
 				}
 				else
 				{
@@ -548,6 +548,37 @@ void CPlayScene::Update(DWORD dt)
 		}
 
 	}
+	int id = CGame::GetInstance()->GetCurrentScene()->GetId();
+	if (id == 4)
+	{
+		float cx = game->GetCamPosX();
+
+		float cy = game->GetCamPosY();
+
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			float Ox, Oy;
+			objects[i]->GetPosition(Ox, Oy);
+			if (!IsInUseArea(Ox, Oy) && !objects[i]->GetisOriginObj())
+			{
+				objects[i]->SetActive(false);
+				objects.erase(objects.begin() + i);
+			}
+		}
+
+		grid->GetObjects(objects, cx, cy);
+		if (player != NULL)
+			player->GetPosition(cx, cy);
+
+
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			objects[i]->Update(dt, &objects);
+		}
+
+	}
+	
+	
 	//CGame::GetInstance()->SetCamPos((int)0, (int)220);
 	// skip the rest if scene was already unloaded (Mario::Update might trigger PlayScene::Unload)
 	if (player == NULL) return;
@@ -561,17 +592,32 @@ void CPlayScene::Update(DWORD dt)
 
 void CPlayScene::Render()
 {
-
 	if (map)
 	{
 		this->map->Render();
 	}
-
-	for (int i = 0; i < objects.size(); i++)
+	int id = CGame::GetInstance()->GetCurrentScene()->GetId();
+	if (id == 4)
 	{
-		objects[i]->Render();
-	}
+		vector<LPGAMEOBJECT> render[MAX_RENDER_LAYER];
 
+		for (size_t i = 0; i < objects.size(); i++)
+		{
+			render[objects[i]->GetRenderLayer() - 1].push_back(objects[i]);
+		}
+		for (int i = 0; i < MAX_RENDER_LAYER; i++)
+		{
+			for (size_t j = 0; j < render[i].size(); j++)
+				render[i][j]->Render();
+		}
+	}
+	else
+	{
+		for (int i = 0; i < objects.size(); i++)
+		{
+			objects[i]->Render();
+		}
+	}
 }
 
 /*
@@ -584,8 +630,26 @@ void CPlayScene::Unload()
 
 	objects.clear();
 	player = NULL;
+	grid->Unload();
+
+	grid = nullptr;
+
+	delete grid;
 
 	DebugOut(L"[INFO] Scene %s unloaded! \n", sceneFilePath);
+}
+
+bool CPlayScene::IsInUseArea(float Ox, float Oy)
+{
+	float CamX, CamY;
+
+	CamX = CGame::GetInstance()->GetCamPosX();
+
+	CamY = CGame::GetInstance()->GetCamPosY();
+
+	if (((CamX < Ox + 50) && (Ox < CamX + 380)) && ((CamY < Oy) && (Oy < CamY + 250)))
+		return true;
+	return false;
 }
 
 void CPlayScenceKeyHandler::OnKeyDown(int KeyCode)

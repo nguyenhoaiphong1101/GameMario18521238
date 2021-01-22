@@ -78,11 +78,11 @@ void CLeaf::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				if (mario->GetLevel() == MARIO_LEVEL_BIG)
 				{
 					mario->SetLevel(MARIO_LEVEL_FOX);
-					mario->y -= MARIO_FOX_BBOX_HEIGHT;
+					mario->y -= 10;
 				}
 				if (mario->GetLevel() == MARIO_LEVEL_FOX)
 				{
-					mario->y -= MARIO_FOX_BBOX_HEIGHT;
+					mario->y -= 10;
 					mario->ScoreUp();
 				}
 				isDisAppear = true;

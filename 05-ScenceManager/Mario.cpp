@@ -18,7 +18,6 @@
 #include "GoombaPara.h"
 #include "KoopaPara.h"
 #include "FireFlower.h"
-#include "NoCollision.h"
 #include "FlowerAttack.h"
 #include "BrickBroken.h"
 #include "RectangleMove.h"
@@ -137,20 +136,20 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (checkEnd == true)
 	{
 		nx = 1;
-		vx = 0.08f;
+		vx = MARIO_WALKING_SPEED_ENDMAP;
 		dx = vx * dt;
 	}
-	if (x > 2815 && ids != 4)
+	if (x > 2815 && ids != MARIO_ID_SCENE_4)
 	{
 		CGame::GetInstance()->SetCamPos((int)0, (int)0);
-		CPortal* p = new CPortal(2);
+		CPortal* p = new CPortal(MARIO_ID_SCENE_2);
 		CGame::GetInstance()->SwitchScene(p->GetSceneId());
 		return;
 	}
-	if (ids == 4 && x > 2570)
+	if (ids == MARIO_ID_SCENE_4 && x > 2570)
 	{
 		CGame::GetInstance()->SetCamPos((int)0, (int)0);
-		CPortal* p = new CPortal(2);
+		CPortal* p = new CPortal(MARIO_ID_SCENE_2);
 		CGame::GetInstance()->SwitchScene(p->GetSceneId());
 		return;
 	}
@@ -160,15 +159,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (marioLife == 0)
 	{
 		CGame::GetInstance()->SetCamPos((int)0, (int)0);
-		CPortal* p = new CPortal(2);
+		CPortal* p = new CPortal(MARIO_ID_SCENE_2);
 		CGame::GetInstance()->SwitchScene(p->GetSceneId());
 
 		return;
 	}
-	if (ids == 4 && y > 1000)
+	if (ids == MARIO_ID_SCENE_4 && y > 1000)
 	{
 		CGame::GetInstance()->SetCamPos((int)0, (int)0);
-		CPortal* p = new CPortal(2);
+		CPortal* p = new CPortal(MARIO_ID_SCENE_2);
 		CGame::GetInstance()->SwitchScene(p->GetSceneId());
 
 		return;
@@ -196,7 +195,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			vy = MARIO_TIME_DRAIN_1_SPEED;
 			dy = vy * dt;
-			if (ids == 4)
+			if (ids == MARIO_ID_SCENE_4)
 			{
 				if (x == 2198)
 				{
@@ -453,10 +452,12 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			}
 			if (dynamic_cast<CDrain*>(e->obj))
 			{
-				if (ids == 4)
+				if (ids == MARIO_ID_SCENE_4)
 				{
-					
+					CDrain* drain = dynamic_cast<CDrain*>(e->obj);
+					x = drain->x - MARIO_X_DRAIN_3;
 						SetState(MARIO_STATE_DRAIN_3);
+						
 				}
 				else
 				{
@@ -490,7 +491,9 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					if (level > MARIO_LEVEL_SMALL)
 					{
+						
 						level--;
+						StartUntouchable();
 					}
 					else
 					{
@@ -500,7 +503,6 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 				}
 			}
-
 			if (dynamic_cast<CKoopaBoomerang*>(e->obj))
 			{
 				CKoopaBoomerang* boomerang_enemy = dynamic_cast<CKoopaBoomerang*>(e->obj);
@@ -509,7 +511,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 					if (boomerang_enemy->GetIsAlive())
 					{
 						boomerang_enemy->SetIsAlive(false);
-						vy = -1.5f * MARIO_JUMP_DEFLECT_SPEED;
+						vy = -MARIO_V_BOOMERANG * MARIO_JUMP_DEFLECT_SPEED;
 					}
 					boomerang_enemy->SetIsAllowToShowScore(true);
 					ScoreUp();
@@ -534,7 +536,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				{
 					CBrickQuestion* brickQuestion = dynamic_cast<CBrickQuestion*>(e->obj);
 					int ids = CGame::GetInstance()->GetCurrentScene()->GetId();
-					if (ids == 4)
+					if (ids == MARIO_ID_SCENE_4)
 					{
 						if (brickQuestion->GetBefore())
 						{
@@ -604,7 +606,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (e->nx != 0)
 				{
-					if(ids==4)
+					if(ids== MARIO_ID_SCENE_4)
 					if (level == MARIO_LEVEL_FOX && attack == true)
 					{
 						CBrickQuestion* brickQuestion = dynamic_cast<CBrickQuestion*>(e->obj);
@@ -996,20 +998,20 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			if (timeDrain != 0)
 			{
-				x = 2198;
-				y = 384;
+				x = MARIO_ID_SCENE_4_DRAIN_X;
+				y = MARIO_ID_SCENE_4_DRAIN_Y;
 				timeDrain = 0;
 			}
 		}
-		if (x==2198)
+		if (x== MARIO_ID_SCENE_4_DRAIN_X)
 		{
-			if (y <= 356)
+			if (y <= MARIO_ID_SCENE_4_DRAIN_Y_2)
 			{
 				SetState(MARIO_STATE_WALKING_RIGHT);
 			}
 		}
 	}
-	if (GetTickCount() - attackCheck > 400)
+	if (GetTickCount() - attackCheck > MARIO_TIME_ATTACK)
 	{
 		if (attackCheck != 0)
 		{
@@ -1050,10 +1052,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	if (ids == 4)
 	{
-		camX_update += 0.03f * dt;
-		if (camX_update >= 1683)
+		camX_update += CAMUPDATE_V * dt;
+		if (camX_update >= CAMUPDATE_V_LIMIT)
 		{
-			camX_update = 1683;
+			camX_update = CAMUPDATE_V_LIMIT;
 		}
 		if(CGame::GetInstance()->GetCamPosX()!= MARIO_MAP_X_4)
 		CGame::GetInstance()->SetCamPos((int)camX_update, (int)MARIO_MAP_Y_4);//1683

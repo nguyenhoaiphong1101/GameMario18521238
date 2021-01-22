@@ -59,16 +59,55 @@ public:
 
 	int show = 1;
 	int state;
+	int renderLayer = 1;
 
 	bool isDisAppear = false;
+	bool Actived = false;
+
+	float origin_x, origin_y;
+
+	int origin_state;
+
+	bool isOriginObj = false;
 	DWORD dt; 
 
 	LPANIMATION_SET animation_set;
 
-public: 
+public:
+	void SetisOriginObj(bool value)
+	{
+		isOriginObj = value;
+	}
+	bool GetisOriginObj()
+	{
+		return isOriginObj;
+	}
+	void reset()
+	{
+		SetState(origin_state);
+		x = origin_x;
+		y = origin_y;
+	}
+
+	void GetOriginLocation(float& x, float& y)
+	{
+		x = origin_x;
+		y = origin_y;
+	}
+
+	void SetActive(bool value)
+	{
+		Actived = value;
+	}
+
+	bool GetActive()
+	{
+		return	Actived;
+	}
 	void SetPosition(float x, float y) { this->x = x, this->y = y; }
+	void SetOrigin(float x, float y, int state) { this->origin_x = x, this->origin_y = y; this->origin_state = state; }
 	void SetSpeed(float vx, float vy) { this->vx = vx, this->vy = vy; }
-	void GetPosition(float &x, float &y) { x = this->x; y = this->y; }
+	void GetPosition(float& x, float& y) {x = this->x; y = this->y; }
 	void GetSpeed(float &vx, float &vy) { vx = this->vx; vy = this->vy; }
 
 	int GetState() { return this->state; }
@@ -95,6 +134,17 @@ public:
 	virtual void Update(DWORD dt, vector<LPGAMEOBJECT> *coObjects = NULL);
 	virtual void Render() = 0;
 	virtual void SetState(int state) { this->state = state; }
+
+	int GetRenderLayer()
+	{
+		return renderLayer;
+	}
+
+	void SetRenderLayer(int renderLayerInt)
+	{
+		renderLayer = renderLayerInt;
+	}
+
 
 
 	~CGameObject();

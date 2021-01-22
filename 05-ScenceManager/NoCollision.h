@@ -1,7 +1,7 @@
-
 #include "GameObject.h"
 
 #define STATE_ANI_BRICKBROKEN	1
+
 class CNoCollision : public CGameObject
 {
 public:

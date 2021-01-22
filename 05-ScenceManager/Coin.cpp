@@ -26,6 +26,10 @@ void CCoin::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector<LPCO
 		{
 			continue;
 		}
+		if (dynamic_cast<CKoopas*>(coObjects->at(i)))
+		{
+			continue;
+		}
 
 		if (e->t > 0 && e->t <= 1.0f)
 			coEvents.push_back(e);

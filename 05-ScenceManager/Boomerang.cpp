@@ -115,7 +115,7 @@ void CBoomerang::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			CKoopaBoomerang* boomerang_enemy = dynamic_cast<CKoopaBoomerang*>(obj);
 			if (this->isAllowToThrowBoomerang && isAllowToSetPosition)
 			{
-				SetPosition(boomerang_enemy->x - 8, boomerang_enemy->y - 5);
+				SetPosition(boomerang_enemy->x - BOOMERANG_ENE_X, boomerang_enemy->y - BOOMERANG_ENE_Y);
 				isAllowToSetPosition = false;
 			}
 		}
