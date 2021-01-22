@@ -86,6 +86,9 @@ CPlayScene::CPlayScene(int id, LPCWSTR filePath) :
 #define OBJECT_TYPE_CONTENTEND_MUSH	33
 #define OBJECT_TYPE_CONTENTEND_STAR	34
 #define OBJECT_TYPE_CONTENTEND_TREE	35
+#define OBJECT_TYPE_CONTENTEND_MUSH_GHOST	36
+#define OBJECT_TYPE_CONTENTEND_STAR_GHOST	37
+#define OBJECT_TYPE_CONTENTEND_TREE_GHOST	38
 
 #define OBJECT_ANI_SET_FIRE	9
 
@@ -358,6 +361,9 @@ void CPlayScene::_ParseSection_OBJECTS(string line)
 	case OBJECT_TYPE_CONTENTEND_MUSH:	  obj = new ContentEnd(1); break;
 	case OBJECT_TYPE_CONTENTEND_STAR:	  obj = new ContentEnd(2); break;
 	case OBJECT_TYPE_CONTENTEND_TREE:	  obj = new ContentEnd(3); break;
+	case OBJECT_TYPE_CONTENTEND_MUSH_GHOST:	  obj = new ContentEnd(4); break;
+	case OBJECT_TYPE_CONTENTEND_STAR_GHOST:	  obj = new ContentEnd(5); break;
+	case OBJECT_TYPE_CONTENTEND_TREE_GHOST:	  obj = new ContentEnd(6); break;
 	case OBJECT_TYPE_BOOMERANG_ENEMY:
 		obj = new CKoopaBoomerang();
 		break;
@@ -717,6 +723,7 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 
 			case DIK_A:
 				mario->holdKoopas = false;
+				mario->holdKoopasCol = false;
 				mario->attack = false;
 				mario->stopRun = GetTickCount();
 				mario->startRun = 0;
@@ -730,7 +737,7 @@ void CPlayScenceKeyHandler::OnKeyUp(int KeyCode)
 				mario->flyCan = false;
 				mario->timeFly = 0;
 				mario->landingCheck = false;
-				mario->holdKoopasCol = false;
+				/*mario->holdKoopasCol = false;*/
 				break;
 			case DIK_DOWN:
 				mario->sit = false;

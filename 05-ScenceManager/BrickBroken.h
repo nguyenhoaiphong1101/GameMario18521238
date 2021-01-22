@@ -18,11 +18,14 @@ class CBrickBroken : public CGameObject
 {
 	int status;
 	int timeStart;
+	
 public:
+	DWORD timeout = -1;
 	CBrickBroken();
 	virtual void GetBoundingBox(float& left, float& top, float& right, float& bottom);
 	virtual void Render();
 	virtual void SetState(int state);
+	virtual void Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects);
 	void BrokenAnimation();
 };
 

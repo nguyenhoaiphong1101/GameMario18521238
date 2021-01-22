@@ -160,7 +160,15 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	if (marioLife == 0)
 	{
 		CGame::GetInstance()->SetCamPos((int)0, (int)0);
-		CPortal* p = new CPortal(1);
+		CPortal* p = new CPortal(2);
+		CGame::GetInstance()->SwitchScene(p->GetSceneId());
+
+		return;
+	}
+	if (ids == 4 && y > 1000)
+	{
+		CGame::GetInstance()->SetCamPos((int)0, (int)0);
+		CPortal* p = new CPortal(2);
 		CGame::GetInstance()->SwitchScene(p->GetSceneId());
 
 		return;
@@ -596,6 +604,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				}
 				if (e->nx != 0)
 				{
+					if(ids==4)
 					if (level == MARIO_LEVEL_FOX && attack == true)
 					{
 						CBrickQuestion* brickQuestion = dynamic_cast<CBrickQuestion*>(e->obj);
@@ -728,6 +737,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 				CEffect* effect = dynamic_cast<CEffect*>(e->obj);
 				if (e->ny < 0)
 				{
+					if(!attack)
 					if (effect->GetState() != EFFECT_P_STATE_AFTER)
 					{
 						effect->y += 9;
@@ -738,7 +748,10 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 							{
 								CBrickBroken* brick = dynamic_cast<CBrickBroken*>(coObjects->at(i));
 								if (brick->GetState() != BRICK_BROKEN_STATE_HIDE)
+								{
+									brick->timeout = GetTickCount();
 									brick->SetState(BRICK_BROKEN_STATE_COIN);
+								}
 							}
 						}
 					}
@@ -922,6 +935,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 
 	if (startRun != 0)
 	{
+		if(holdKoopasCol!=true)
 		if (GetTickCount() - startRun > MARIO_FLY_LEVEL_SPEED)
 		{
 			if (levelFly < MARIO_FLY_LEVEL)
@@ -1042,7 +1056,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			camX_update = 1683;
 		}
 		if(CGame::GetInstance()->GetCamPosX()!= MARIO_MAP_X_4)
-		CGame::GetInstance()->SetCamPos((int)1683, (int)MARIO_MAP_Y_4);//1683
+		CGame::GetInstance()->SetCamPos((int)camX_update, (int)MARIO_MAP_Y_4);//1683
 		if (x > MARIO_MAP_X_4)
 		{
 			GetPosition(cx, cy);
@@ -1068,7 +1082,7 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 	}
 	if (x < camX_update)
 	{
-		//x = camX_update;
+		x = camX_update;
 	}
 }
 

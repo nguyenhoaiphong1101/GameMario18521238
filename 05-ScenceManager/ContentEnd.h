@@ -5,6 +5,9 @@
 #define TYPEMUSH 1
 #define TYPESTAR 2
 #define TYPETREE 3
+#define TYPEMUSH 4
+#define TYPESTAR 5
+#define TYPETREE 6
 
 class ContentEnd : public CGameObject
 {

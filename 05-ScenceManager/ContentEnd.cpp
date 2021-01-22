@@ -19,7 +19,15 @@ void ContentEnd::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void ContentEnd::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 {
-
+	if (type >= 4)
+	{
+		if (show)
+		{
+			vy = -0.07f;
+		}
+	}
+	CGameObject::Update(dt);
+	y += dy;
 	LPSCENE scence = CGame::GetInstance()->GetCurrentScene();
 	CMario* mario = ((CPlayScene*)scence)->GetPlayer();
 	if (mario->checkEnd)
@@ -28,6 +36,20 @@ void ContentEnd::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 			show = true;
 		if (mario->card == type)
 			show = true;
+		switch (mario->card)
+		{
+		case 1:
+			if (type == 4)
+				show = true;
+		case 2:
+			if (type == 5)
+				show = true;
+		case 3:
+			if (type == 6)
+				show = true;
+		default:
+			break;
+		}
 	}
 }
 
