@@ -1057,8 +1057,13 @@ void CMario::Update(DWORD dt, vector<LPGAMEOBJECT>* coObjects)
 		{
 			camX_update = CAMUPDATE_V_LIMIT;
 		}
-		if(CGame::GetInstance()->GetCamPosX()!= MARIO_MAP_X_4)
-		CGame::GetInstance()->SetCamPos((int)camX_update, (int)MARIO_MAP_Y_4);//1683
+		if (CGame::GetInstance()->GetCamPosX() != MARIO_MAP_X_4)
+		{
+			/*GetPosition(cx, cy);
+			CGame* game4 = CGame::GetInstance();
+			cx -= game4->GetScreenWidth() / 2;*/
+			CGame::GetInstance()->SetCamPos((int)camX_update, (int)MARIO_MAP_Y_4);
+		}
 		if (x > MARIO_MAP_X_4)
 		{
 			GetPosition(cx, cy);

@@ -41,6 +41,10 @@ void CKoopaPara::CalcPotentialCollisions(vector<LPGAMEOBJECT>* coObjects, vector
 		{
 			continue;
 		}
+		if (dynamic_cast<CRectangleMove*>(coObjects->at(i)))
+		{
+			continue;
+		}
 
 		if (e->t > 0 && e->t <= 1.0f)
 			coEvents.push_back(e);
