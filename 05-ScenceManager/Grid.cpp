@@ -80,8 +80,8 @@ void CGrid::_ParseSection_OBJECTS(string line)
 	int x = atoi(tokens[1].c_str());
 	int y = atoi(tokens[2].c_str());
 
-	int cellX = (x / cellWidth);
-	int cellY = (y / cellHeight);
+	int cellX = atoi(tokens[5].c_str());
+	int cellY = atoi(tokens[6].c_str());
 
 	int type = atoi(tokens[0].c_str());
 
